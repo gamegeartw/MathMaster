@@ -86,6 +86,11 @@ export class AppComponent {
 
   // --- Game Flow & Event Handlers ---
 
+  /**
+   * @description 處理自訂題目數量的變更事件。
+   * @description 如果輸入值為負數，會將其重設為 null。
+   * @param value - 從輸入框傳來的新數值，可以是數字或 null。
+   */
   handleCustomQuestionCountChange(value: number | null) {
     if (value !== null && value < 0) {
       this.customQuestionCount.set(null);
@@ -94,6 +99,11 @@ export class AppComponent {
     }
   }
 
+  /**
+   * @description 根據使用者在主選單的選擇，設定練習模式並開始遊戲。
+   * @description 如果選擇的是估商模式，會先切換到除數選擇畫面。
+   * @param mode - 使用者選擇的數學練習模式 (MathMode)。
+   */
   selectMode(mode: MathMode) {
     if (mode === MathMode.Div) {
       this.appMode.set(AppMode.DivSelect);
@@ -104,12 +114,20 @@ export class AppComponent {
     }
   }
 
+  /**
+   * @description 在估商模式中，設定使用者選擇的除數並開始遊戲。
+   * @param num - 使用者選擇的除數 (2-9)。
+   */
   selectDivisor(num: number) {
     this.selectedMathMode.set(MathMode.Div);
     this.specificDivisor.set(num);
     this.initializeGame();
   }
 
+  /**
+   * @description 初始化一場新的遊戲。
+   * @description 會根據模式設定總題數、重設分數和計數器，並載入第一題。
+   */
   initializeGame() {
     let count = 10;
     const custom = this.customQuestionCount();
@@ -134,6 +152,10 @@ export class AppComponent {
     this.nextQuestion();
   }
 
+  /**
+   * @description 返回主選單。
+   * @description 會停止計時器並重設所有遊戲相關的狀態。
+   */
   returnToMenu() {
     this.stopTimer();
     this.appMode.set(AppMode.Menu);
@@ -144,6 +166,10 @@ export class AppComponent {
     this.specificDivisor.set(null);
   }
 
+  /**
+   * @description 載入下一道題目。
+   * @description 如果已達總題數，則結束遊戲；否則，產生新題目並重設計時器。
+   */
   nextQuestion() {
     if (this.questionCount() >= this.totalQuestions()) {
       this.finishGame();
@@ -176,6 +202,9 @@ export class AppComponent {
     }, 1000);
   }
 
+  /**
+   * @description 停止當前題目的計時器。
+   */
   stopTimer() {
     if (this.timerInterval) {
       clearInterval(this.timerInterval);
@@ -183,6 +212,10 @@ export class AppComponent {
     }
   }
 
+  /**
+   * @description 結束遊戲流程。
+   * @description 計算總花費時間，並切換到總結畫面。
+   */
   finishGame() {
     const endTime = Date.now();
     const durationSeconds = Math.round((endTime - this.sessionStartTime()) / 1000);
@@ -194,6 +227,10 @@ export class AppComponent {
 
   // --- Interaction Handlers ---
 
+  /**
+   * @description 從數字鍵盤附加一個數字到答案區。
+   * @param num - 要附加的數字 (0-9)。
+   */
   appendNumber(num: number) {
     if (this.feedbackType() === 'success') return;
     const current = this.userAnswer();
@@ -202,12 +239,19 @@ export class AppComponent {
     }
   }
 
+  /**
+   * @description 從答案區刪除最後一個數字 (退格)。
+   */
   backspace() {
     if (this.feedbackType() === 'success') return;
     const current = this.userAnswer();
     this.userAnswer.set(current.slice(0, -1));
   }
 
+  /**
+   * @description 檢查使用者輸入的答案是否正確。
+   * @description 根據結果給予回饋、更新分數，並在答對時自動進入下一題。
+   */
   checkAnswer() {
     const problem = this.currentProblem();
     if (!problem || !this.userAnswer()) return;
@@ -252,6 +296,10 @@ export class AppComponent {
     }
   }
 
+  /**
+   * @description 向 AI 老師請求幫助。
+   * @description 會呼叫 AI Tutor 服務來取得目前問題的提示。
+   */
   async askForHelp() {
     const problem = this.currentProblem();
     if (!problem) return;
@@ -265,6 +313,10 @@ export class AppComponent {
 
   // --- Leaderboard Logic ---
 
+  /**
+   * @description 提交分數到排行榜。
+   * @description 只有在輸入玩家名稱後才能提交。
+   */
   async submitScore() {
     if (!this.playerName().trim()) return;
 
@@ -280,6 +332,10 @@ export class AppComponent {
     this.showLeaderboard();
   }
 
+  /**
+   * @description 顯示排行榜畫面。
+   * @description 會先從服務取得最新的排行榜資料，然後切換到排行榜畫面。
+   */
   async showLeaderboard() {
     this.appMode.set(AppMode.Leaderboard);
     const data = await this.leaderboardService.getTopScores();
