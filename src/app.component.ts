@@ -66,6 +66,7 @@ export class AppComponent {
   timerInterval: any;
   sessionStartTime = signal<number>(0);
   sessionTotalTimeSeconds = signal<number>(0);
+  sessionElapsedTime = signal<number>(0);
   isTimeWarning = computed(() => this.timerSeconds() > 30);
 
   // Leaderboard
@@ -152,6 +153,7 @@ export class AppComponent {
     this.score.set(0);
     this.questionCount.set(0);
     this.sessionStartTime.set(Date.now());
+    this.sessionElapsedTime.set(0);
     this.nextQuestion();
   }
 
@@ -168,6 +170,7 @@ export class AppComponent {
     this.feedbackMessage.set('');
     this.aiHint.set('');
     this.specificDivisor.set(null);
+    this.sessionElapsedTime.set(0);
   }
 
   /**
@@ -204,6 +207,8 @@ export class AppComponent {
     this.timerSeconds.set(0);
     this.timerInterval = setInterval(() => {
       this.timerSeconds.update(s => s + 1);
+      const elapsed = Math.round((Date.now() - this.sessionStartTime()) / 1000);
+      this.sessionElapsedTime.set(elapsed);
     }, 1000);
   }
 
@@ -222,9 +227,8 @@ export class AppComponent {
    * @description 計算總花費時間，並切換到總結畫面。
    */
   finishGame() {
-    const endTime = Date.now();
-    const durationSeconds = Math.round((endTime - this.sessionStartTime()) / 1000);
-    this.sessionTotalTimeSeconds.set(durationSeconds);
+    // 使用最後一次更新的總耗時，而不是重新計算，以避免包含最後一題的延遲時間
+    this.sessionTotalTimeSeconds.set(this.sessionElapsedTime());
 
     this.stopTimer();
     this.voiceService.cancel();
@@ -298,6 +302,8 @@ export class AppComponent {
       if (!this.timerInterval) {
          this.timerInterval = setInterval(() => {
           this.timerSeconds.update(s => s + 1);
+          const elapsed = Math.round((Date.now() - this.sessionStartTime()) / 1000);
+          this.sessionElapsedTime.set(elapsed);
         }, 1000);
       }
     }

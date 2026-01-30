@@ -21,6 +21,7 @@ export class GameComponent {
   isLoadingAi = input.required<boolean>();
   isSpeaking = input.required<boolean>();
   timerSeconds = input.required<number>();
+  sessionElapsedTime = input.required<number>();
   isTimeWarning = input.required<boolean>();
   userAnswer = input.required<string>();
 
@@ -44,5 +45,16 @@ export class GameComponent {
     } else if (!this.isLoadingAi()){
       this.helpRequested.emit();
     }
+  }
+
+  /**
+   * @description 將總秒數格式化為 "分:秒" (M:SS) 的字串。
+   * @param totalSeconds - 要格式化的總秒數。
+   * @returns {string} 格式化後的時間字串。
+   */
+  formatTime(totalSeconds: number): string {
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   }
 }
