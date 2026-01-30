@@ -1,6 +1,7 @@
 import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ScoreEntry } from '../../services/leaderboard.service';
+import { MathMode } from '../../app.types';
 
 @Component({
   selector: 'app-leaderboard',
@@ -58,12 +59,12 @@ export class LeaderboardComponent {
   leaderboardData = input.required<ScoreEntry[]>();
   backClicked = output<void>();
 
-  getModeDisplayName(mode: string): string {
+  getModeDisplayName(mode: MathMode): string {
     switch (mode) {
-      case 'add': return '加法';
-      case 'sub': return '減法';
-      case 'div': return '估商';
-      case 'mixed': return '綜合';
+      case MathMode.Add: return '加法';
+      case MathMode.Sub: return '減法';
+      case MathMode.Div: return '估商';
+      case MathMode.Mixed: return '綜合';
       default: return '未知';
     }
   }

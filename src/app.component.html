@@ -2,7 +2,7 @@
   
   <!-- Header remains in the main component as a global element -->
   <header class="w-full shrink-0 flex justify-between items-center mb-2 bg-white px-4 py-2 rounded-xl shadow-sm z-10 h-14">
-    @if (appMode() === 'game') {
+    @if (appMode() === AppMode.Game) {
       <button (click)="returnToMenu()" class="text-gray-500 hover:text-gray-800 font-bold px-2 py-1 text-sm bg-gray-100 rounded-lg">
         ← 放棄
       </button>
@@ -14,10 +14,10 @@
         </div>
       </div>
     } @else {
-      <button *ngIf="appMode() !== 'menu'" (click)="returnToMenu()" class="text-gray-500 hover:text-gray-800 font-bold p-2">
+      <button *ngIf="appMode() !== AppMode.Menu" (click)="returnToMenu()" class="text-gray-500 hover:text-gray-800 font-bold p-2">
         ← 主選單
       </button>
-      <span *ngIf="appMode() === 'menu'" class="text-lg font-bold text-indigo-600">數學大師五年級</span>
+      <span *ngIf="appMode() === AppMode.Menu" class="text-lg font-bold text-indigo-600">數學大師五年級</span>
     }
   </header>
 
@@ -25,7 +25,7 @@
   <main class="w-full flex-1 flex flex-col relative overflow-hidden">
     
     @switch (appMode()) {
-      @case ('menu') {
+      @case (AppMode.Menu) {
         <app-menu 
           [customQuestionCount]="customQuestionCount()"
           (customQuestionCountChange)="handleCustomQuestionCountChange($event)"
@@ -33,13 +33,13 @@
           (leaderboardClicked)="showLeaderboard()"
         />
       }
-      @case ('div-select') {
+      @case (AppMode.DivSelect) {
         <app-divisor-select
           (divisorSelected)="selectDivisor($event)"
           (backClicked)="returnToMenu()"
         />
       }
-      @case ('game') {
+      @case (AppMode.Game) {
         <app-game
           [questionCount]="questionCount()"
           [totalQuestions]="totalQuestions()"
@@ -59,7 +59,7 @@
           (helpRequested)="askForHelp()"
         />
       }
-      @case ('summary') {
+      @case (AppMode.Summary) {
         <app-summary
           [score]="score()"
           [sessionTotalTimeSeconds]="sessionTotalTimeSeconds()"
@@ -68,7 +68,7 @@
           (scoreSubmitted)="submitScore()"
         />
       }
-      @case ('leaderboard') {
+      @case (AppMode.Leaderboard) {
         <app-leaderboard
           [leaderboardData]="leaderboardData()"
           (backClicked)="returnToMenu()"

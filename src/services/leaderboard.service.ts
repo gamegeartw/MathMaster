@@ -1,11 +1,12 @@
 import { Injectable, signal } from '@angular/core';
 import { initializeApp, FirebaseApp } from 'firebase/app';
 import { getFirestore, collection, addDoc, query, orderBy, limit, getDocs, Firestore, Timestamp } from 'firebase/firestore';
+import { MathMode } from '../app.types';
 
 export interface ScoreEntry {
   name: string;
   score: number;
-  mode: string;
+  mode: MathMode;
   date: Date;
   timeSpentSeconds: number;
 }
@@ -82,7 +83,7 @@ export class LeaderboardService {
         return {
           name: data['name'],
           score: data['score'],
-          mode: data['mode'],
+          mode: data['mode'] as MathMode,
           date: (data['date'] as Timestamp).toDate(),
           timeSpentSeconds: data['timeSpentSeconds'] || 0
         };

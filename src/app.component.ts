@@ -10,9 +10,7 @@ import { DivisorSelectComponent } from './components/divisor-select/divisor-sele
 import { GameComponent } from './components/game/game.component';
 import { SummaryComponent } from './components/summary/summary.component';
 import { LeaderboardComponent } from './components/leaderboard/leaderboard.component';
-
-export type AppMode = 'menu' | 'div-select' | 'game' | 'summary' | 'leaderboard';
-export type MathMode = 'add' | 'sub' | 'div' | 'mixed';
+import { AppMode, MathMode } from './app.types';
 
 @Component({
   selector: 'app-root',
@@ -34,9 +32,12 @@ export class AppComponent {
   aiService = inject(AiTutorService);
   leaderboardService = inject(LeaderboardService);
 
+  // Expose enums to template
+  AppMode = AppMode;
+
   // --- State Signals ---
-  appMode = signal<AppMode>('menu');
-  selectedMathMode = signal<MathMode>('add');
+  appMode = signal<AppMode>(AppMode.Menu);
+  selectedMathMode = signal<MathMode>(MathMode.Add);
   specificDivisor = signal<number | null>(null);
   
   // Game State
@@ -69,13 +70,13 @@ export class AppComponent {
   // --- Computed ---
   modeTitle = computed(() => {
     switch (this.selectedMathMode()) {
-      case 'add': return '加法練習';
-      case 'sub': return '減法練習';
-      case 'div': 
+      case MathMode.Add: return '加法練習';
+      case MathMode.Sub: return '減法練習';
+      case MathMode.Div: 
         return this.specificDivisor() 
           ? `估商練習 (${this.specificDivisor()})` 
           : '估商練習';
-      case 'mixed': return '綜合挑戰';
+      case MathMode.Mixed: return '綜合挑戰';
       default: return '數學大師';
     }
   });
@@ -91,8 +92,8 @@ export class AppComponent {
   }
 
   selectMode(mode: MathMode) {
-    if (mode === 'div') {
-      this.appMode.set('div-select');
+    if (mode === MathMode.Div) {
+      this.appMode.set(AppMode.DivSelect);
     } else {
       this.selectedMathMode.set(mode);
       this.specificDivisor.set(null);
@@ -101,7 +102,7 @@ export class AppComponent {
   }
 
   selectDivisor(num: number) {
-    this.selectedMathMode.set('div');
+    this.selectedMathMode.set(MathMode.Div);
     this.specificDivisor.set(num);
     this.initializeGame();
   }
@@ -115,15 +116,15 @@ export class AppComponent {
       count = custom;
     } else {
       switch (mode) {
-        case 'add': count = 50; break;
-        case 'sub': count = 50; break;
-        case 'div': count = 15; break;
-        case 'mixed': count = 20; break;
+        case MathMode.Add: count = 50; break;
+        case MathMode.Sub: count = 50; break;
+        case MathMode.Div: count = 15; break;
+        case MathMode.Mixed: count = 20; break;
       }
     }
     
     this.totalQuestions.set(count);
-    this.appMode.set('game');
+    this.appMode.set(AppMode.Game);
     this.score.set(0);
     this.questionCount.set(0);
     this.sessionStartTime.set(Date.now());
@@ -132,7 +133,7 @@ export class AppComponent {
 
   returnToMenu() {
     this.stopTimer();
-    this.appMode.set('menu');
+    this.appMode.set(AppMode.Menu);
     this.currentProblem.set(null);
     this.userAnswer.set('');
     this.feedbackMessage.set('');
@@ -156,12 +157,12 @@ export class AppComponent {
     
     let problem: MathProblem;
     switch (this.selectedMathMode()) {
-      case 'add': problem = this.mathService.generateAddition(); break;
-      case 'sub': problem = this.mathService.generateSubtraction(); break;
-      case 'div': 
+      case MathMode.Add: problem = this.mathService.generateAddition(); break;
+      case MathMode.Sub: problem = this.mathService.generateSubtraction(); break;
+      case MathMode.Div: 
         problem = this.mathService.generateDivision(this.specificDivisor() || undefined); 
         break;
-      case 'mixed': problem = this.mathService.generateMixed(); break;
+      case MathMode.Mixed: problem = this.mathService.generateMixed(); break;
       default: problem = this.mathService.generateAddition();
     }
     this.currentProblem.set(problem);
@@ -185,7 +186,7 @@ export class AppComponent {
     this.sessionTotalTimeSeconds.set(durationSeconds);
 
     this.stopTimer();
-    this.appMode.set('summary');
+    this.appMode.set(AppMode.Summary);
   }
 
   // --- Interaction Handlers ---
@@ -277,7 +278,7 @@ export class AppComponent {
   }
 
   async showLeaderboard() {
-    this.appMode.set('leaderboard');
+    this.appMode.set(AppMode.Leaderboard);
     const data = await this.leaderboardService.getTopScores();
     this.leaderboardData.set(data);
   }

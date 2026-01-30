@@ -1,6 +1,6 @@
 import { Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MathMode } from '../../app.component';
+import { MathMode } from '../../app.types';
 
 @Component({
   selector: 'app-menu',
@@ -26,25 +26,25 @@ import { MathMode } from '../../app.component';
       <h1 class="text-xl font-bold text-center text-slate-800 my-1 shrink-0">請選擇練習模式</h1>
       
       <div class="grid grid-cols-2 gap-3 flex-1 min-h-0 content-start">
-        <button (click)="selectMode('add')" 
+        <button (click)="selectMode(MathMode.Add)" 
           class="aspect-[4/3] rounded-2xl bg-blue-500 hover:bg-blue-600 text-white shadow-lg transform transition active:scale-95 flex flex-col items-center justify-center gap-1 p-2">
           <span class="text-3xl">➕</span> 
           <span class="text-xl font-bold">加法</span>
         </button>
 
-        <button (click)="selectMode('sub')" 
+        <button (click)="selectMode(MathMode.Sub)" 
           class="aspect-[4/3] rounded-2xl bg-green-500 hover:bg-green-600 text-white shadow-lg transform transition active:scale-95 flex flex-col items-center justify-center gap-1 p-2">
           <span class="text-3xl">➖</span> 
           <span class="text-xl font-bold">減法</span>
         </button>
 
-        <button (click)="selectMode('div')" 
+        <button (click)="selectMode(MathMode.Div)" 
           class="aspect-[4/3] rounded-2xl bg-purple-500 hover:bg-purple-600 text-white shadow-lg transform transition active:scale-95 flex flex-col items-center justify-center gap-1 p-2">
           <span class="text-3xl">➗</span> 
           <span class="text-xl font-bold">估商</span>
         </button>
         
-        <button (click)="selectMode('mixed')" 
+        <button (click)="selectMode(MathMode.Mixed)" 
           class="aspect-[4/3] rounded-2xl bg-orange-500 hover:bg-orange-600 text-white shadow-lg transform transition active:scale-95 flex flex-col items-center justify-center gap-1 p-2">
           <span class="text-3xl">🎲</span> 
           <span class="text-xl font-bold">綜合</span>
@@ -67,6 +67,8 @@ export class MenuComponent {
   customQuestionCountChange = output<number | null>();
   modeSelected = output<MathMode>();
   leaderboardClicked = output<void>();
+
+  MathMode = MathMode;
 
   handleCustomQuestionCountChange(value: number | null) {
     this.customQuestionCountChange.emit(value);
