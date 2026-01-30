@@ -8,53 +8,7 @@ import { I18nService } from '../../services/i18n.service';
   selector: 'app-leaderboard',
   standalone: true,
   imports: [CommonModule],
-  template: `
-    <div class="flex flex-col w-full h-full animate-fade-in pb-2">
-      <h2 class="text-xl font-bold text-slate-800 mb-2 text-center shrink-0">{{ i18n.t('leaderboardTitle') }}</h2>
-      
-      <div class="bg-white rounded-2xl shadow-lg w-full overflow-hidden flex-1 mb-2 flex flex-col min-h-0">
-        <div class="p-3 bg-indigo-50 border-b border-indigo-100 grid grid-cols-12 gap-2 text-xs sm:text-sm font-bold text-indigo-900 shrink-0">
-          <div class="col-span-1">{{ i18n.t('rank') }}</div>
-          <div class="col-span-4">{{ i18n.t('name') }}</div>
-          <div class="col-span-3 text-center">{{ i18n.t('mode') }}</div>
-          <div class="col-span-2 text-center">{{ i18n.t('time') }}</div>
-          <div class="col-span-2 text-right">{{ i18n.t('score') }}</div>
-        </div>
-        
-        <div class="overflow-y-auto flex-1 p-0">
-          @for (entry of leaderboardData(); track $index) {
-            <div class="p-3 border-b border-slate-100 grid grid-cols-12 gap-2 items-center text-xs sm:text-sm" 
-                  [class.bg-yellow-50]="$index < 3">
-              <div class="col-span-1 font-bold text-slate-500">
-                @if ($index === 0) { 🥇 }
-                @else if ($index === 1) { 🥈 }
-                @else if ($index === 2) { 🥉 }
-                @else { {{ $index + 1 }} }
-              </div>
-              <div class="col-span-4 font-bold text-slate-800 truncate">{{ entry.name }}</div>
-              <div class="col-span-3 text-center text-slate-500 bg-slate-100 rounded-full py-0.5 px-1">
-                  {{ getModeDisplayName(entry.mode) }}
-              </div>
-              <div class="col-span-2 text-center font-mono text-slate-600">
-                {{ formatTime(entry.timeSpentSeconds) }}
-              </div>
-              <div class="col-span-2 text-right font-mono text-indigo-600 font-bold">{{ entry.score }}</div>
-            </div>
-          }
-          @if (leaderboardData().length === 0) {
-            <div class="p-8 text-center text-gray-400 text-sm">
-              {{ i18n.t('noRecords') }}
-            </div>
-          }
-        </div>
-      </div>
-
-      <button (click)="backClicked.emit()" 
-        class="shrink-0 w-full py-3 rounded-xl bg-slate-200 text-slate-700 font-bold text-lg shadow hover:bg-slate-300">
-        {{ i18n.t('mainMenu') }}
-      </button>
-    </div>
-  `
+  templateUrl: './leaderboard.component.html'
 })
 export class LeaderboardComponent {
   leaderboardData = input.required<ScoreEntry[]>();

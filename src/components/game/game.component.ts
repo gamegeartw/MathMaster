@@ -7,76 +7,7 @@ import { I18nService } from '../../services/i18n.service';
   selector: 'app-game',
   standalone: true,
   imports: [CommonModule],
-  template: `
-    <div class="flex flex-col items-center w-full h-full justify-between gap-2">
-      
-      <div class="w-full bg-white rounded-2xl shadow-sm p-2 flex flex-col items-center border-b-4 border-slate-100 relative overflow-hidden flex-1 min-h-0 justify-center">
-        
-          <div [class]="isTimeWarning() ? 'bg-red-100 text-red-600 animate-pulse' : 'bg-slate-100 text-slate-600'" 
-              class="absolute top-2 right-2 px-2 py-1 rounded text-xs font-mono font-bold flex items-center gap-1">
-            ⏱ {{ timerSeconds() }}s
-          </div>
-
-        <h2 class="text-sm text-slate-400 font-bold uppercase tracking-wider mb-1">{{ modeTitle() }}</h2>
-        
-        <div class="text-4xl sm:text-5xl font-bold text-slate-800 mb-2 text-center leading-tight">
-            {{ currentProblem()?.questionStr }}
-        </div>
-        
-        <div class="w-full max-w-[80%] h-14 bg-slate-100 rounded-xl flex items-center justify-center text-3xl font-mono font-bold text-blue-600 border-2 border-slate-200 relative mb-1">
-            {{ userAnswer() }}<span class="animate-pulse text-slate-300">|</span>
-        </div>
-
-        <div class="min-h-[3rem] px-2 flex items-center justify-center w-full">
-          @if (feedbackMessage()) {
-            <div [class]="feedbackType() === 'success' ? 'text-green-600 font-bold text-lg' : 'text-red-500 font-bold text-base text-center leading-tight'">
-              {{ feedbackMessage() }}
-            </div>
-          } @else if (aiHint()) {
-            <div class="text-purple-600 text-center text-xs bg-purple-50 p-1 rounded border border-purple-200 leading-tight line-clamp-2">
-              🤖 {{ aiHint() }}
-            </div>
-          } @else if (isLoadingAi()) {
-            <div class="text-purple-500 text-xs animate-pulse">{{ i18n.t('thinking') }}...</div>
-          }
-        </div>
-      </div>
-
-      <div class="w-full shrink-0 flex flex-col gap-2">
-        
-        <div class="grid grid-cols-3 gap-2">
-          @for (num of keypadNumbers; track num) {
-            <button (click)="numberAppended.emit(num)" 
-              class="h-14 sm:h-16 bg-white rounded-xl shadow-sm text-2xl font-bold text-slate-700 active:bg-slate-100 border-b-4 border-slate-200 active:border-b-0 active:translate-y-1 transition-all">
-              {{ num }}
-            </button>
-          }
-          
-          <button (click)="helpRequested.emit()" 
-            class="h-14 sm:h-16 bg-purple-50 rounded-xl shadow-sm text-purple-600 font-bold text-sm flex flex-col items-center justify-center active:bg-purple-100 border-b-4 border-purple-100 active:border-b-0 active:translate-y-1 transition-all">
-            <span>{{ i18n.t('aiTeacher') }}</span>
-          </button>
-          
-          <button (click)="numberAppended.emit(0)" 
-            class="h-14 sm:h-16 bg-white rounded-xl shadow-sm text-2xl font-bold text-slate-700 active:bg-slate-100 border-b-4 border-slate-200 active:border-b-0 active:translate-y-1 transition-all">
-            0
-          </button>
-          
-          <button (click)="backspaceClicked.emit()" 
-            class="h-14 sm:h-16 bg-red-50 rounded-xl shadow-sm text-red-500 font-bold active:bg-red-100 border-b-4 border-red-100 active:border-b-0 active:translate-y-1 flex items-center justify-center transition-all">
-            ⌫
-          </button>
-        </div>
-
-        <button (click)="answerChecked.emit()" 
-          [disabled]="userAnswer().length === 0"
-          [class]="userAnswer().length > 0 ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg border-b-4 border-indigo-800 active:border-b-0 active:translate-y-1' : 'bg-slate-300 text-white cursor-not-allowed border-b-4 border-slate-400'"
-          class="w-full h-14 sm:h-16 rounded-2xl text-2xl font-bold transition-all duration-100 flex items-center justify-center gap-2">
-          {{ i18n.t('submitAnswer') }}
-        </button>
-      </div>
-    </div>
-  `
+  templateUrl: './game.component.html'
 })
 export class GameComponent {
   questionCount = input.required<number>();

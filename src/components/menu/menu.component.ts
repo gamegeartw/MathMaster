@@ -7,61 +7,7 @@ import { I18nService } from '../../services/i18n.service';
   selector: 'app-menu',
   standalone: true,
   imports: [FormsModule],
-  template: `
-    <div class="flex flex-col gap-3 w-full h-full animate-fade-in overflow-y-auto pb-4">
-      
-      <div class="w-full bg-white p-3 rounded-xl shadow-sm border border-slate-200 shrink-0">
-        <div class="flex items-center justify-between">
-            <label class="text-slate-600 font-bold text-sm">
-            {{ i18n.t('questionsPerRound') }}
-          </label>
-          <input type="number" 
-            min="0"
-            [ngModel]="customQuestionCount()" 
-            (ngModelChange)="handleCustomQuestionCountChange($event)" 
-            [placeholder]="i18n.t('default')"
-            class="w-20 p-1 rounded-lg border-2 border-slate-200 focus:border-indigo-500 outline-none text-center font-bold text-sm">
-        </div>
-      </div>
-
-      <h1 class="text-xl font-bold text-center text-slate-800 my-1 shrink-0">{{ i18n.t('selectMode') }}</h1>
-      
-      <div class="grid grid-cols-2 gap-3 flex-1 min-h-0 content-start">
-        <button (click)="selectMode(MathMode.Add)" 
-          class="aspect-[4/3] rounded-2xl bg-blue-500 hover:bg-blue-600 text-white shadow-lg transform transition active:scale-95 flex flex-col items-center justify-center gap-1 p-2">
-          <span class="text-3xl">➕</span> 
-          <span class="text-xl font-bold">{{ i18n.t('addition') }}</span>
-        </button>
-
-        <button (click)="selectMode(MathMode.Sub)" 
-          class="aspect-[4/3] rounded-2xl bg-green-500 hover:bg-green-600 text-white shadow-lg transform transition active:scale-95 flex flex-col items-center justify-center gap-1 p-2">
-          <span class="text-3xl">➖</span> 
-          <span class="text-xl font-bold">{{ i18n.t('subtraction') }}</span>
-        </button>
-
-        <button (click)="selectMode(MathMode.Div)" 
-          class="aspect-[4/3] rounded-2xl bg-purple-500 hover:bg-purple-600 text-white shadow-lg transform transition active:scale-95 flex flex-col items-center justify-center gap-1 p-2">
-          <span class="text-3xl">➗</span> 
-          <span class="text-xl font-bold">{{ i18n.t('division') }}</span>
-        </button>
-        
-        <button (click)="selectMode(MathMode.Mixed)" 
-          class="aspect-[4/3] rounded-2xl bg-orange-500 hover:bg-orange-600 text-white shadow-lg transform transition active:scale-95 flex flex-col items-center justify-center gap-1 p-2">
-          <span class="text-3xl">🎲</span> 
-          <span class="text-xl font-bold">{{ i18n.t('mixed') }}</span>
-        </button>
-      </div>
-
-      <button (click)="showLeaderboard()" 
-        class="shrink-0 w-full py-3 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold shadow flex items-center justify-center gap-2">
-        {{ i18n.t('viewLeaderboard') }}
-      </button>
-
-      <div class="shrink-0 text-center text-gray-400 text-xs">
-        {{ i18n.t('appDescription') }}
-      </div>
-    </div>
-  `
+  templateUrl: './menu.component.html'
 })
 export class MenuComponent {
   customQuestionCount = input.required<number | null>();
