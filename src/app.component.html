@@ -1,0 +1,272 @@
+<div class="min-h-screen flex flex-col items-center p-4 max-w-md mx-auto relative">
+  
+  <!-- Header / Score -->
+  <header class="w-full flex justify-between items-center mb-6 bg-white p-4 rounded-2xl shadow-sm z-10">
+    @if (appMode() === 'game') {
+      <button (click)="returnToMenu()" class="text-gray-500 hover:text-gray-800 font-bold p-2 text-sm">
+        ← 放棄
+      </button>
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-bold text-gray-400">第 {{ questionCount() }}/{{ totalQuestions() }} 題</span>
+        <div class="bg-yellow-100 px-4 py-1 rounded-full text-yellow-800 font-bold border border-yellow-300">
+          分數: {{ score() }}
+        </div>
+      </div>
+    } @else {
+      <button *ngIf="appMode() !== 'menu'" (click)="returnToMenu()" class="text-gray-500 hover:text-gray-800 font-bold p-2">
+        ← 主選單
+      </button>
+      <span *ngIf="appMode() === 'menu'" class="text-xl font-bold text-indigo-600">數學大師</span>
+    }
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="w-full flex-1 flex flex-col relative">
+    
+    <!-- MENU VIEW -->
+    @if (appMode() === 'menu') {
+      <div class="flex flex-col gap-4 w-full animate-fade-in">
+        
+        <!-- Custom Settings -->
+        <div class="w-full bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+          <label class="block text-slate-600 font-bold mb-2 text-sm">
+            ⚙️ 設定每回合題數
+          </label>
+          <input type="number" 
+            [ngModel]="customQuestionCount()" 
+            (ngModelChange)="customQuestionCount.set($event)" 
+            placeholder="預設: 加減50 / 估商15"
+            class="w-full p-3 rounded-xl border-2 border-slate-200 focus:border-indigo-500 outline-none text-center font-bold text-lg">
+          <div class="text-xs text-gray-400 mt-2 text-center">
+            留空或填 0 則使用系統預設值
+          </div>
+        </div>
+
+        <h1 class="text-3xl font-bold text-center text-slate-800 mb-4">請選擇練習模式</h1>
+        
+        <button (click)="selectMode('add')" 
+          class="w-full py-6 rounded-3xl bg-blue-500 hover:bg-blue-600 text-white text-2xl font-bold shadow-lg transform transition active:scale-95 flex items-center justify-center gap-3">
+          <span>➕</span> 加法練習
+        </button>
+
+        <button (click)="selectMode('sub')" 
+          class="w-full py-6 rounded-3xl bg-green-500 hover:bg-green-600 text-white text-2xl font-bold shadow-lg transform transition active:scale-95 flex items-center justify-center gap-3">
+          <span>➖</span> 減法練習
+        </button>
+
+        <button (click)="selectMode('div')" 
+          class="w-full py-6 rounded-3xl bg-purple-500 hover:bg-purple-600 text-white text-2xl font-bold shadow-lg transform transition active:scale-95 flex items-center justify-center gap-3">
+          <span>➗</span> 估商練習
+        </button>
+        
+        <button (click)="selectMode('mixed')" 
+          class="w-full py-6 rounded-3xl bg-orange-500 hover:bg-orange-600 text-white text-2xl font-bold shadow-lg transform transition active:scale-95 flex items-center justify-center gap-3">
+          <span>🎲</span> 綜合挑戰
+        </button>
+
+        <button (click)="showLeaderboard()" 
+          class="mt-4 w-full py-4 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold shadow flex items-center justify-center gap-2">
+          <span>🏆</span> 查看排行榜
+        </button>
+
+        <div class="mt-8 text-center text-gray-500 text-sm">
+          五年級適用 • 數字範圍 21-70
+        </div>
+      </div>
+    }
+
+    <!-- DIVISION SELECT VIEW -->
+    @if (appMode() === 'div-select') {
+      <div class="flex flex-col gap-4 w-full animate-fade-in">
+        <h1 class="text-2xl font-bold text-center text-slate-800 mb-2">請選擇估商數字</h1>
+        <p class="text-center text-slate-500 mb-4">練習 2 到 9 的估商</p>
+        
+        <div class="grid grid-cols-2 gap-4">
+          @for (num of [2, 3, 4, 5, 6, 7, 8, 9]; track num) {
+            <button (click)="selectDivisor(num)"
+              class="py-6 rounded-2xl bg-white border-2 border-purple-100 hover:border-purple-500 hover:bg-purple-50 text-purple-600 text-3xl font-bold shadow-sm active:scale-95 transition-all">
+              {{ num }}
+            </button>
+          }
+        </div>
+
+        <button (click)="returnToMenu()" class="mt-8 w-full py-4 text-slate-400 font-bold">
+          取消，返回主選單
+        </button>
+      </div>
+    }
+
+    <!-- GAME VIEW -->
+    @if (appMode() === 'game') {
+      <div class="flex flex-col items-center w-full flex-1 justify-between">
+        
+        <!-- Timer Bar -->
+        <div class="w-full mb-2 flex justify-end">
+          <div [class]="isTimeWarning() ? 'bg-red-100 text-red-600 animate-pulse' : 'bg-slate-100 text-slate-600'" 
+               class="px-3 py-1 rounded-lg font-mono font-bold flex items-center gap-2">
+            ⏱ {{ timerSeconds() }}s
+            @if (isTimeWarning()) { <span class="text-xs">快一點喔!</span> }
+          </div>
+        </div>
+
+        <!-- Question Area -->
+        <div class="w-full bg-white rounded-3xl shadow-lg p-6 mb-4 flex flex-col items-center border-b-4 border-slate-100 relative overflow-hidden">
+          <h2 class="text-lg text-slate-400 font-bold uppercase tracking-wider mb-2">{{ modeTitle() }}</h2>
+          
+          <div class="text-5xl font-bold text-slate-800 mb-6 text-center leading-tight">
+             {{ currentProblem()?.questionStr }}
+          </div>
+          
+          <!-- Answer Display -->
+          <div class="w-full h-20 bg-slate-100 rounded-xl flex items-center justify-center text-4xl font-mono font-bold text-blue-600 border-2 border-slate-200 relative">
+             {{ userAnswer() }}<span class="animate-pulse text-slate-300">|</span>
+             
+             <!-- Voice Input Button (Inside Input Box) -->
+             <button (click)="toggleVoiceInput()" 
+               [class.mic-pulse]="voiceService.isListening()"
+               class="absolute right-2 top-2 bottom-2 aspect-square rounded-lg bg-white shadow-sm border border-slate-200 flex items-center justify-center text-xl transition-all active:scale-95 z-20">
+               @if (voiceService.isListening()) {
+                 🔴
+               } @else {
+                 🎤
+               }
+             </button>
+          </div>
+          
+          <!-- Voice Hints / Errors -->
+          @if(voiceService.isListening()) {
+            <div class="absolute top-2 right-2 text-xs bg-red-500 text-white px-2 py-1 rounded animate-pulse">
+              正在聽...請說數字
+            </div>
+          }
+          @if(voiceService.error()) {
+             <div class="text-red-500 text-xs font-bold mt-1 text-center bg-red-50 px-2 py-1 rounded border border-red-100">
+               ⚠️ {{ voiceService.error() }}
+             </div>
+          }
+
+          <!-- Feedback & Hints -->
+          <div class="min-h-[4rem] flex items-center justify-center w-full mt-2">
+            @if (feedbackMessage()) {
+              <div [class]="feedbackType() === 'success' ? 'text-green-600 font-bold text-xl animate-bounce' : 'text-red-500 font-bold text-xl'">
+                {{ feedbackMessage() }}
+              </div>
+            } @else if (aiHint()) {
+              <div class="text-purple-600 text-center text-sm bg-purple-50 p-2 rounded-lg border border-purple-200">
+                🤖 {{ aiHint() }}
+              </div>
+            } @else if (isLoadingAi()) {
+              <div class="text-purple-500 text-sm animate-pulse">老師正在思考中...</div>
+            }
+          </div>
+        </div>
+
+        <!-- Controls Container -->
+        <div class="w-full grid grid-cols-3 gap-3">
+          <!-- Numeric Keypad -->
+          @for (num of [1, 2, 3, 4, 5, 6, 7, 8, 9]; track num) {
+            <button (click)="appendNumber(num)" 
+              class="h-16 bg-white rounded-2xl shadow-sm text-2xl font-bold text-slate-700 active:bg-slate-100 border border-slate-200">
+              {{ num }}
+            </button>
+          }
+          
+          <!-- Bottom Row: Help, 0, Backspace -->
+          <button (click)="askForHelp()" 
+            class="h-16 bg-purple-100 rounded-2xl shadow-sm text-purple-700 font-bold text-sm flex flex-col items-center justify-center active:bg-purple-200 border border-purple-200">
+            <span>💡 提示</span>
+          </button>
+          
+          <button (click)="appendNumber(0)" 
+            class="h-16 bg-white rounded-2xl shadow-sm text-2xl font-bold text-slate-700 active:bg-slate-100 border border-slate-200">
+            0
+          </button>
+          
+          <button (click)="backspace()" 
+            class="h-16 bg-red-50 rounded-2xl shadow-sm text-red-500 font-bold active:bg-red-100 border border-red-200 flex items-center justify-center">
+            ⌫
+          </button>
+        </div>
+
+        <!-- Check Button -->
+        <button (click)="checkAnswer()" 
+          [disabled]="userAnswer().length === 0"
+          [class]="userAnswer().length > 0 ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg translate-y-0' : 'bg-slate-300 text-white cursor-not-allowed shadow-none'"
+          class="w-full mt-4 h-16 rounded-3xl text-2xl font-bold transition-all duration-200 flex items-center justify-center gap-2 mb-2">
+          送出答案
+        </button>
+
+      </div>
+    }
+
+    <!-- SUMMARY VIEW -->
+    @if (appMode() === 'summary') {
+      <div class="flex flex-col items-center justify-center w-full h-full animate-fade-in gap-6">
+        <div class="text-6xl mb-4">🎉</div>
+        <h2 class="text-3xl font-bold text-slate-800">測驗結束！</h2>
+        
+        <div class="bg-white p-6 rounded-3xl shadow-lg w-full text-center border-b-4 border-slate-100">
+          <div class="text-gray-500 mb-2">你的總分</div>
+          <div class="text-6xl font-bold text-indigo-600 mb-6">{{ score() }}</div>
+          
+          <div class="text-left">
+            <label class="block text-sm font-bold text-slate-700 mb-2">輸入你的名字:</label>
+            <input type="text" 
+              [ngModel]="playerName()" 
+              (ngModelChange)="playerName.set($event)"
+              placeholder="例如: 小明" 
+              class="w-full p-4 rounded-xl border-2 border-slate-200 text-lg focus:border-indigo-500 outline-none">
+          </div>
+        </div>
+
+        <button (click)="submitScore()" [disabled]="!playerName()"
+          class="w-full py-4 rounded-2xl bg-indigo-600 text-white font-bold text-xl shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
+          查看排名 🏆
+        </button>
+      </div>
+    }
+
+    <!-- LEADERBOARD VIEW -->
+    @if (appMode() === 'leaderboard') {
+      <div class="flex flex-col w-full h-full animate-fade-in">
+        <h2 class="text-2xl font-bold text-slate-800 mb-4 text-center">🏆 排行榜</h2>
+        
+        <div class="bg-white rounded-3xl shadow-lg w-full overflow-hidden flex-1 mb-4 flex flex-col">
+          <div class="p-4 bg-indigo-50 border-b border-indigo-100 grid grid-cols-12 gap-2 text-sm font-bold text-indigo-900">
+            <div class="col-span-2">#</div>
+            <div class="col-span-5">姓名</div>
+            <div class="col-span-5 text-right">分數</div>
+          </div>
+          
+          <div class="overflow-y-auto flex-1">
+            @for (entry of leaderboardData(); track $index) {
+              <div class="p-4 border-b border-slate-100 grid grid-cols-12 gap-2 items-center" 
+                   [class.bg-yellow-50]="$index < 3">
+                <div class="col-span-2 font-bold text-slate-500">
+                  @if ($index === 0) { 🥇 }
+                  @else if ($index === 1) { 🥈 }
+                  @else if ($index === 2) { 🥉 }
+                  @else { {{ $index + 1 }} }
+                </div>
+                <div class="col-span-5 font-bold text-slate-800 truncate">{{ entry.name }}</div>
+                <div class="col-span-5 text-right font-mono text-indigo-600 font-bold">{{ entry.score }}</div>
+              </div>
+            }
+            @if (leaderboardData().length === 0) {
+              <div class="p-8 text-center text-gray-400">
+                目前還沒有紀錄，快去挑戰吧！
+              </div>
+            }
+          </div>
+        </div>
+
+        <button (click)="returnToMenu()" 
+          class="w-full py-4 rounded-2xl bg-slate-200 text-slate-700 font-bold text-xl shadow hover:bg-slate-300">
+          回主選單
+        </button>
+      </div>
+    }
+
+  </main>
+
+</div>
