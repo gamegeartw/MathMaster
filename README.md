@@ -1,5 +1,7 @@
 # 數學大師五年級 (Math Master Grade 5)
 
+> 本專案使用 [Gemini AI Studio](https://aistudio.google.com/) 開發。
+
 專為國小五年級學生設計的趣味數學練習 App，旨在透過互動式練習與即時回饋，提升學生的計算能力與學習興趣。
 
 ## ✨ App 特色
@@ -66,3 +68,9 @@
 ├── index.tsx                   # 應用程式啟動腳本 (Angular Bootstrap)
 └── metadata.json               # 應用程式元數據
 ```
+
+---
+
+## 📜 License
+
+This project is licensed under the MIT License.
