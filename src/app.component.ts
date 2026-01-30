@@ -1,17 +1,31 @@
-import { Component, signal, inject, computed, effect } from '@angular/core';
+import { Component, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MathService, MathProblem } from './services/math.service';
 import { AiTutorService } from './services/ai-tutor.service';
 import { LeaderboardService, ScoreEntry } from './services/leaderboard.service';
 
-type AppMode = 'menu' | 'div-select' | 'game' | 'summary' | 'leaderboard';
-type MathMode = 'add' | 'sub' | 'div' | 'mixed';
+import { MenuComponent } from './components/menu/menu.component';
+import { DivisorSelectComponent } from './components/divisor-select/divisor-select.component';
+import { GameComponent } from './components/game/game.component';
+import { SummaryComponent } from './components/summary/summary.component';
+import { LeaderboardComponent } from './components/leaderboard/leaderboard.component';
+
+export type AppMode = 'menu' | 'div-select' | 'game' | 'summary' | 'leaderboard';
+export type MathMode = 'add' | 'sub' | 'div' | 'mixed';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule, 
+    FormsModule,
+    MenuComponent,
+    DivisorSelectComponent,
+    GameComponent,
+    SummaryComponent,
+    LeaderboardComponent
+  ],
   templateUrl: './app.component.html',
   styleUrls: []
 })
@@ -22,14 +36,14 @@ export class AppComponent {
 
   // --- State Signals ---
   appMode = signal<AppMode>('menu');
-  selectedMathMode = signal<MathMode>('add'); // Stores which math type we are doing
-  specificDivisor = signal<number | null>(null); // For division mode specific selection
+  selectedMathMode = signal<MathMode>('add');
+  specificDivisor = signal<number | null>(null);
   
   // Game State
   currentProblem = signal<MathProblem | null>(null);
   userAnswer = signal<string>('');
   score = signal<number>(0);
-  questionCount = signal<number>(0); // Current question number
+  questionCount = signal<number>(0);
   
   // Configuration
   totalQuestions = signal<number>(10);
@@ -42,7 +56,7 @@ export class AppComponent {
   isLoadingAi = signal<boolean>(false);
 
   // Timers
-  timerSeconds = signal<number>(0); // Per question
+  timerSeconds = signal<number>(0);
   timerInterval: any;
   sessionStartTime = signal<number>(0);
   sessionTotalTimeSeconds = signal<number>(0);
@@ -66,41 +80,33 @@ export class AppComponent {
     }
   });
 
-  constructor() {}
-
-  // --- Game Flow ---
+  // --- Game Flow & Event Handlers ---
 
   handleCustomQuestionCountChange(value: number | null) {
-    // The input type="number" can emit null if empty.
-    // We prevent negative numbers. 0 is allowed for default.
     if (value !== null && value < 0) {
-      this.customQuestionCount.set(null); // Reset to show placeholder
+      this.customQuestionCount.set(null);
     } else {
       this.customQuestionCount.set(value);
     }
   }
 
-  // Step 1: Menu selection
   selectMode(mode: MathMode) {
     if (mode === 'div') {
       this.appMode.set('div-select');
     } else {
       this.selectedMathMode.set(mode);
-      this.specificDivisor.set(null); // Clear previous selection
+      this.specificDivisor.set(null);
       this.initializeGame();
     }
   }
 
-  // Step 1.5: Division specific selection
   selectDivisor(num: number) {
     this.selectedMathMode.set('div');
     this.specificDivisor.set(num);
     this.initializeGame();
   }
 
-  // Step 2: Initialize Game Configuration
   initializeGame() {
-    // Determine total questions
     let count = 10;
     const custom = this.customQuestionCount();
     const mode = this.selectedMathMode();
@@ -120,7 +126,7 @@ export class AppComponent {
     this.appMode.set('game');
     this.score.set(0);
     this.questionCount.set(0);
-    this.sessionStartTime.set(Date.now()); // Start session timer
+    this.sessionStartTime.set(Date.now());
     this.nextQuestion();
   }
 
@@ -135,7 +141,6 @@ export class AppComponent {
   }
 
   nextQuestion() {
-    // Check if game over
     if (this.questionCount() >= this.totalQuestions()) {
       this.finishGame();
       return;
@@ -144,19 +149,16 @@ export class AppComponent {
     this.stopTimer();
     this.questionCount.update(c => c + 1);
     
-    // Reset UI for new question
     this.userAnswer.set('');
     this.feedbackMessage.set('');
     this.feedbackType.set('neutral');
     this.aiHint.set('');
     
-    // Generate Problem
     let problem: MathProblem;
     switch (this.selectedMathMode()) {
       case 'add': problem = this.mathService.generateAddition(); break;
       case 'sub': problem = this.mathService.generateSubtraction(); break;
       case 'div': 
-        // Pass the specific divisor if set
         problem = this.mathService.generateDivision(this.specificDivisor() || undefined); 
         break;
       case 'mixed': problem = this.mathService.generateMixed(); break;
@@ -164,7 +166,6 @@ export class AppComponent {
     }
     this.currentProblem.set(problem);
 
-    // Start Timer for the question
     this.timerSeconds.set(0);
     this.timerInterval = setInterval(() => {
       this.timerSeconds.update(s => s + 1);
@@ -187,7 +188,7 @@ export class AppComponent {
     this.appMode.set('summary');
   }
 
-  // --- Interaction ---
+  // --- Interaction Handlers ---
 
   appendNumber(num: number) {
     if (this.feedbackType() === 'success') return;
@@ -219,39 +220,26 @@ export class AppComponent {
         this.nextQuestion();
       }, 1500);
     } else {
-      // WRONG ANSWER - Logic-based Feedback
       this.feedbackType.set('error');
       this.score.update(s => Math.max(0, s - 5));
       this.userAnswer.set('');
 
-      // Generate specific helpful hint
       let msg = '再試一次喔！';
-      
       if (problem.type === 'div') {
         const dividend = problem.operand1;
         const divisor = problem.operand2;
         const check = divisor * val;
-
         if (val > correct) {
-          // Guess too high: check (divisor * val) > dividend
           msg = `太大囉！ ${divisor} × ${val} = ${check}，比 ${dividend} 還大！`;
         } else {
-          // Guess too low: remainder is too big
           const remainder = dividend - check;
           msg = `太小囉！ ${divisor} × ${val} = ${check}，剩下的 ${remainder} 夠再分喔！`;
         }
       } else {
-        // Addition / Subtraction
-        if (val > correct) {
-          msg = '太大囉！試著數字小一點 👇';
-        } else {
-          msg = '太小囉！試著數字大一點 👆';
-        }
+        msg = val > correct ? '太大囉！試著數字小一點 👇' : '太小囉！試著數字大一點 👆';
       }
-      
       this.feedbackMessage.set(msg);
 
-      // Keep timer running if wrong
       if (!this.timerInterval) {
          this.timerInterval = setInterval(() => {
           this.timerSeconds.update(s => s + 1);
@@ -266,9 +254,7 @@ export class AppComponent {
 
     this.isLoadingAi.set(true);
     this.aiHint.set('');
-    
     const hint = await this.aiService.getExplanation(problem.hintPrompt);
-    
     this.aiHint.set(hint);
     this.isLoadingAi.set(false);
   }
@@ -281,7 +267,7 @@ export class AppComponent {
     const entry: ScoreEntry = {
       name: this.playerName().trim(),
       score: this.score(),
-      mode: this.selectedMathMode(), // 'add', 'sub', etc.
+      mode: this.selectedMathMode(),
       date: new Date(),
       timeSpentSeconds: this.sessionTotalTimeSeconds()
     };
@@ -294,22 +280,5 @@ export class AppComponent {
     this.appMode.set('leaderboard');
     const data = await this.leaderboardService.getTopScores();
     this.leaderboardData.set(data);
-  }
-
-  // Helper for display
-  getModeDisplayName(mode: string): string {
-    switch (mode) {
-      case 'add': return '加法';
-      case 'sub': return '減法';
-      case 'div': return '估商';
-      case 'mixed': return '綜合';
-      default: return '未知';
-    }
-  }
-
-  formatTime(totalSeconds: number): string {
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   }
 }
