@@ -1,221 +1,208 @@
-<div class="min-h-screen flex flex-col items-center p-4 max-w-md mx-auto relative">
+<div class="h-[100dvh] w-full flex flex-col items-center p-2 max-w-md mx-auto relative overflow-hidden bg-[#f0f9ff]">
   
   <!-- Header / Score -->
-  <header class="w-full flex justify-between items-center mb-6 bg-white p-4 rounded-2xl shadow-sm z-10">
+  <!-- Made more compact: py-2 instead of p-4, mb-2 instead of mb-6 -->
+  <header class="w-full shrink-0 flex justify-between items-center mb-2 bg-white px-4 py-2 rounded-xl shadow-sm z-10 h-14">
     @if (appMode() === 'game') {
-      <button (click)="returnToMenu()" class="text-gray-500 hover:text-gray-800 font-bold p-2 text-sm">
+      <button (click)="returnToMenu()" class="text-gray-500 hover:text-gray-800 font-bold px-2 py-1 text-sm bg-gray-100 rounded-lg">
         ← 放棄
       </button>
       <div class="flex items-center gap-2">
-        <span class="text-xs font-bold text-gray-400">第 {{ questionCount() }}/{{ totalQuestions() }} 題</span>
-        <div class="bg-yellow-100 px-4 py-1 rounded-full text-yellow-800 font-bold border border-yellow-300">
-          分數: {{ score() }}
+        <span class="text-xs font-bold text-gray-400 hidden sm:inline">第 {{ questionCount() }}/{{ totalQuestions() }} 題</span>
+        <span class="text-xs font-bold text-gray-400 sm:hidden">{{ questionCount() }}/{{ totalQuestions() }}</span>
+        <div class="bg-yellow-100 px-3 py-1 rounded-full text-yellow-800 font-bold border border-yellow-300 text-sm">
+          {{ score() }}分
         </div>
       </div>
     } @else {
       <button *ngIf="appMode() !== 'menu'" (click)="returnToMenu()" class="text-gray-500 hover:text-gray-800 font-bold p-2">
         ← 主選單
       </button>
-      <span *ngIf="appMode() === 'menu'" class="text-xl font-bold text-indigo-600">數學大師</span>
+      <span *ngIf="appMode() === 'menu'" class="text-lg font-bold text-indigo-600">數學大師五年級</span>
     }
   </header>
 
   <!-- Main Content Area -->
-  <main class="w-full flex-1 flex flex-col relative">
+  <!-- Added overflow-y-auto for menu content if it gets too tall on very small screens, but hid scrollbar generally -->
+  <main class="w-full flex-1 flex flex-col relative overflow-hidden">
     
     <!-- MENU VIEW -->
     @if (appMode() === 'menu') {
-      <div class="flex flex-col gap-4 w-full animate-fade-in">
+      <div class="flex flex-col gap-3 w-full h-full animate-fade-in overflow-y-auto pb-4">
         
-        <!-- Custom Settings -->
-        <div class="w-full bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
-          <label class="block text-slate-600 font-bold mb-2 text-sm">
-            ⚙️ 設定每回合題數
-          </label>
-          <input type="number" 
-            [ngModel]="customQuestionCount()" 
-            (ngModelChange)="customQuestionCount.set($event)" 
-            placeholder="預設: 加減50 / 估商15"
-            class="w-full p-3 rounded-xl border-2 border-slate-200 focus:border-indigo-500 outline-none text-center font-bold text-lg">
-          <div class="text-xs text-gray-400 mt-2 text-center">
-            留空或填 0 則使用系統預設值
+        <!-- Custom Settings (Compact) -->
+        <div class="w-full bg-white p-3 rounded-xl shadow-sm border border-slate-200 shrink-0">
+          <div class="flex items-center justify-between">
+             <label class="text-slate-600 font-bold text-sm">
+              ⚙️ 每回合題數
+            </label>
+            <input type="number" 
+              [ngModel]="customQuestionCount()" 
+              (ngModelChange)="customQuestionCount.set($event)" 
+              placeholder="預設"
+              class="w-20 p-1 rounded-lg border-2 border-slate-200 focus:border-indigo-500 outline-none text-center font-bold text-sm">
           </div>
         </div>
 
-        <h1 class="text-3xl font-bold text-center text-slate-800 mb-4">請選擇練習模式</h1>
+        <h1 class="text-xl font-bold text-center text-slate-800 my-1 shrink-0">請選擇練習模式</h1>
         
-        <button (click)="selectMode('add')" 
-          class="w-full py-6 rounded-3xl bg-blue-500 hover:bg-blue-600 text-white text-2xl font-bold shadow-lg transform transition active:scale-95 flex items-center justify-center gap-3">
-          <span>➕</span> 加法練習
-        </button>
+        <!-- Grid Layout for Buttons (2x2) to save vertical space -->
+        <div class="grid grid-cols-2 gap-3 flex-1 min-h-0 content-start">
+          <button (click)="selectMode('add')" 
+            class="aspect-[4/3] rounded-2xl bg-blue-500 hover:bg-blue-600 text-white shadow-lg transform transition active:scale-95 flex flex-col items-center justify-center gap-1 p-2">
+            <span class="text-3xl">➕</span> 
+            <span class="text-xl font-bold">加法</span>
+          </button>
 
-        <button (click)="selectMode('sub')" 
-          class="w-full py-6 rounded-3xl bg-green-500 hover:bg-green-600 text-white text-2xl font-bold shadow-lg transform transition active:scale-95 flex items-center justify-center gap-3">
-          <span>➖</span> 減法練習
-        </button>
+          <button (click)="selectMode('sub')" 
+            class="aspect-[4/3] rounded-2xl bg-green-500 hover:bg-green-600 text-white shadow-lg transform transition active:scale-95 flex flex-col items-center justify-center gap-1 p-2">
+            <span class="text-3xl">➖</span> 
+            <span class="text-xl font-bold">減法</span>
+          </button>
 
-        <button (click)="selectMode('div')" 
-          class="w-full py-6 rounded-3xl bg-purple-500 hover:bg-purple-600 text-white text-2xl font-bold shadow-lg transform transition active:scale-95 flex items-center justify-center gap-3">
-          <span>➗</span> 估商練習
-        </button>
-        
-        <button (click)="selectMode('mixed')" 
-          class="w-full py-6 rounded-3xl bg-orange-500 hover:bg-orange-600 text-white text-2xl font-bold shadow-lg transform transition active:scale-95 flex items-center justify-center gap-3">
-          <span>🎲</span> 綜合挑戰
-        </button>
+          <button (click)="selectMode('div')" 
+            class="aspect-[4/3] rounded-2xl bg-purple-500 hover:bg-purple-600 text-white shadow-lg transform transition active:scale-95 flex flex-col items-center justify-center gap-1 p-2">
+            <span class="text-3xl">➗</span> 
+            <span class="text-xl font-bold">估商</span>
+          </button>
+          
+          <button (click)="selectMode('mixed')" 
+            class="aspect-[4/3] rounded-2xl bg-orange-500 hover:bg-orange-600 text-white shadow-lg transform transition active:scale-95 flex flex-col items-center justify-center gap-1 p-2">
+            <span class="text-3xl">🎲</span> 
+            <span class="text-xl font-bold">綜合</span>
+          </button>
+        </div>
 
         <button (click)="showLeaderboard()" 
-          class="mt-4 w-full py-4 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold shadow flex items-center justify-center gap-2">
+          class="shrink-0 w-full py-3 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold shadow flex items-center justify-center gap-2">
           <span>🏆</span> 查看排行榜
         </button>
 
-        <div class="mt-8 text-center text-gray-500 text-sm">
-          五年級適用 • 數字範圍 21-70
+        <div class="shrink-0 text-center text-gray-400 text-xs">
+          適用五年級 • 範圍 21-70
         </div>
       </div>
     }
 
     <!-- DIVISION SELECT VIEW -->
     @if (appMode() === 'div-select') {
-      <div class="flex flex-col gap-4 w-full animate-fade-in">
-        <h1 class="text-2xl font-bold text-center text-slate-800 mb-2">請選擇估商數字</h1>
-        <p class="text-center text-slate-500 mb-4">練習 2 到 9 的估商</p>
+      <div class="flex flex-col gap-3 w-full h-full animate-fade-in overflow-y-auto">
+        <h1 class="text-xl font-bold text-center text-slate-800 shrink-0">選擇估商數字</h1>
         
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-2 gap-3 flex-1 content-start">
           @for (num of [2, 3, 4, 5, 6, 7, 8, 9]; track num) {
             <button (click)="selectDivisor(num)"
-              class="py-6 rounded-2xl bg-white border-2 border-purple-100 hover:border-purple-500 hover:bg-purple-50 text-purple-600 text-3xl font-bold shadow-sm active:scale-95 transition-all">
+              class="h-20 rounded-2xl bg-white border-2 border-purple-100 hover:border-purple-500 hover:bg-purple-50 text-purple-600 text-3xl font-bold shadow-sm active:scale-95 transition-all flex items-center justify-center">
               {{ num }}
             </button>
           }
         </div>
 
-        <button (click)="returnToMenu()" class="mt-8 w-full py-4 text-slate-400 font-bold">
-          取消，返回主選單
+        <button (click)="returnToMenu()" class="shrink-0 mb-2 w-full py-3 text-slate-400 font-bold border border-slate-200 rounded-xl">
+          取消返回
         </button>
       </div>
     }
 
     <!-- GAME VIEW -->
     @if (appMode() === 'game') {
-      <div class="flex flex-col items-center w-full flex-1 justify-between">
+      <div class="flex flex-col items-center w-full h-full justify-between gap-2">
         
-        <!-- Timer Bar -->
-        <div class="w-full mb-2 flex justify-end">
-          <div [class]="isTimeWarning() ? 'bg-red-100 text-red-600 animate-pulse' : 'bg-slate-100 text-slate-600'" 
-               class="px-3 py-1 rounded-lg font-mono font-bold flex items-center gap-2">
-            ⏱ {{ timerSeconds() }}s
-            @if (isTimeWarning()) { <span class="text-xs">快一點喔!</span> }
-          </div>
-        </div>
-
-        <!-- Question Area -->
-        <div class="w-full bg-white rounded-3xl shadow-lg p-6 mb-4 flex flex-col items-center border-b-4 border-slate-100 relative overflow-hidden">
-          <h2 class="text-lg text-slate-400 font-bold uppercase tracking-wider mb-2">{{ modeTitle() }}</h2>
+        <!-- Question Area: Flex-1 to take available space, nicely centered -->
+        <div class="w-full bg-white rounded-2xl shadow-sm p-2 flex flex-col items-center border-b-4 border-slate-100 relative overflow-hidden flex-1 min-h-0 justify-center">
           
-          <div class="text-5xl font-bold text-slate-800 mb-6 text-center leading-tight">
+           <!-- Timer (moved inside box for space) -->
+           <div [class]="isTimeWarning() ? 'bg-red-100 text-red-600 animate-pulse' : 'bg-slate-100 text-slate-600'" 
+                class="absolute top-2 right-2 px-2 py-1 rounded text-xs font-mono font-bold flex items-center gap-1">
+             ⏱ {{ timerSeconds() }}s
+           </div>
+
+          <h2 class="text-sm text-slate-400 font-bold uppercase tracking-wider mb-1">{{ modeTitle() }}</h2>
+          
+          <div class="text-4xl sm:text-5xl font-bold text-slate-800 mb-2 text-center leading-tight">
              {{ currentProblem()?.questionStr }}
           </div>
           
-          <!-- Answer Display -->
-          <div class="w-full h-20 bg-slate-100 rounded-xl flex items-center justify-center text-4xl font-mono font-bold text-blue-600 border-2 border-slate-200 relative">
+          <!-- Answer Display (Compact, Cleaned) -->
+          <div class="w-full max-w-[80%] h-14 bg-slate-100 rounded-xl flex items-center justify-center text-3xl font-mono font-bold text-blue-600 border-2 border-slate-200 relative mb-1">
              {{ userAnswer() }}<span class="animate-pulse text-slate-300">|</span>
-             
-             <!-- Voice Input Button (Inside Input Box) -->
-             <button (click)="toggleVoiceInput()" 
-               [class.mic-pulse]="voiceService.isListening()"
-               class="absolute right-2 top-2 bottom-2 aspect-square rounded-lg bg-white shadow-sm border border-slate-200 flex items-center justify-center text-xl transition-all active:scale-95 z-20">
-               @if (voiceService.isListening()) {
-                 🔴
-               } @else {
-                 🎤
-               }
-             </button>
           </div>
-          
-          <!-- Voice Hints / Errors -->
-          @if(voiceService.isListening()) {
-            <div class="absolute top-2 right-2 text-xs bg-red-500 text-white px-2 py-1 rounded animate-pulse">
-              正在聽...請說數字
-            </div>
-          }
-          @if(voiceService.error()) {
-             <div class="text-red-500 text-xs font-bold mt-1 text-center bg-red-50 px-2 py-1 rounded border border-red-100">
-               ⚠️ {{ voiceService.error() }}
-             </div>
-          }
 
-          <!-- Feedback & Hints -->
-          <div class="min-h-[4rem] flex items-center justify-center w-full mt-2">
+          <!-- Feedback & Hints (Compact container) -->
+          <div class="min-h-[3rem] px-2 flex items-center justify-center w-full">
             @if (feedbackMessage()) {
-              <div [class]="feedbackType() === 'success' ? 'text-green-600 font-bold text-xl animate-bounce' : 'text-red-500 font-bold text-xl'">
+              <div [class]="feedbackType() === 'success' ? 'text-green-600 font-bold text-lg' : 'text-red-500 font-bold text-base text-center leading-tight'">
                 {{ feedbackMessage() }}
               </div>
             } @else if (aiHint()) {
-              <div class="text-purple-600 text-center text-sm bg-purple-50 p-2 rounded-lg border border-purple-200">
+              <div class="text-purple-600 text-center text-xs bg-purple-50 p-1 rounded border border-purple-200 leading-tight line-clamp-2">
                 🤖 {{ aiHint() }}
               </div>
             } @else if (isLoadingAi()) {
-              <div class="text-purple-500 text-sm animate-pulse">老師正在思考中...</div>
+              <div class="text-purple-500 text-xs animate-pulse">思考中...</div>
             }
           </div>
         </div>
 
-        <!-- Controls Container -->
-        <div class="w-full grid grid-cols-3 gap-3">
-          <!-- Numeric Keypad -->
-          @for (num of [1, 2, 3, 4, 5, 6, 7, 8, 9]; track num) {
-            <button (click)="appendNumber(num)" 
-              class="h-16 bg-white rounded-2xl shadow-sm text-2xl font-bold text-slate-700 active:bg-slate-100 border border-slate-200">
-              {{ num }}
+        <!-- Controls Container (Fixed at bottom) -->
+        <div class="w-full shrink-0 flex flex-col gap-2">
+          
+          <!-- Keypad: 4 Columns Grid to include tools inline if needed, or 3 cols standard -->
+          <!-- Using standard 3-col layout but reducing height -->
+          <div class="grid grid-cols-3 gap-2">
+            @for (num of [1, 2, 3, 4, 5, 6, 7, 8, 9]; track num) {
+              <button (click)="appendNumber(num)" 
+                class="h-14 sm:h-16 bg-white rounded-xl shadow-sm text-2xl font-bold text-slate-700 active:bg-slate-100 border-b-4 border-slate-200 active:border-b-0 active:translate-y-1 transition-all">
+                {{ num }}
+              </button>
+            }
+            
+            <!-- Bottom Row -->
+            <button (click)="askForHelp()" 
+              class="h-14 sm:h-16 bg-purple-50 rounded-xl shadow-sm text-purple-600 font-bold text-sm flex flex-col items-center justify-center active:bg-purple-100 border-b-4 border-purple-100 active:border-b-0 active:translate-y-1 transition-all">
+              <span>💡AI老師</span>
             </button>
-          }
-          
-          <!-- Bottom Row: Help, 0, Backspace -->
-          <button (click)="askForHelp()" 
-            class="h-16 bg-purple-100 rounded-2xl shadow-sm text-purple-700 font-bold text-sm flex flex-col items-center justify-center active:bg-purple-200 border border-purple-200">
-            <span>💡 提示</span>
-          </button>
-          
-          <button (click)="appendNumber(0)" 
-            class="h-16 bg-white rounded-2xl shadow-sm text-2xl font-bold text-slate-700 active:bg-slate-100 border border-slate-200">
-            0
-          </button>
-          
-          <button (click)="backspace()" 
-            class="h-16 bg-red-50 rounded-2xl shadow-sm text-red-500 font-bold active:bg-red-100 border border-red-200 flex items-center justify-center">
-            ⌫
+            
+            <button (click)="appendNumber(0)" 
+              class="h-14 sm:h-16 bg-white rounded-xl shadow-sm text-2xl font-bold text-slate-700 active:bg-slate-100 border-b-4 border-slate-200 active:border-b-0 active:translate-y-1 transition-all">
+              0
+            </button>
+            
+            <button (click)="backspace()" 
+              class="h-14 sm:h-16 bg-red-50 rounded-xl shadow-sm text-red-500 font-bold active:bg-red-100 border-b-4 border-red-100 active:border-b-0 active:translate-y-1 flex items-center justify-center transition-all">
+              ⌫
+            </button>
+          </div>
+
+          <!-- Check Button (Wide) -->
+          <button (click)="checkAnswer()" 
+            [disabled]="userAnswer().length === 0"
+            [class]="userAnswer().length > 0 ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg border-b-4 border-indigo-800 active:border-b-0 active:translate-y-1' : 'bg-slate-300 text-white cursor-not-allowed border-b-4 border-slate-400'"
+            class="w-full h-14 sm:h-16 rounded-2xl text-2xl font-bold transition-all duration-100 flex items-center justify-center gap-2">
+            送出答案
           </button>
         </div>
-
-        <!-- Check Button -->
-        <button (click)="checkAnswer()" 
-          [disabled]="userAnswer().length === 0"
-          [class]="userAnswer().length > 0 ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg translate-y-0' : 'bg-slate-300 text-white cursor-not-allowed shadow-none'"
-          class="w-full mt-4 h-16 rounded-3xl text-2xl font-bold transition-all duration-200 flex items-center justify-center gap-2 mb-2">
-          送出答案
-        </button>
 
       </div>
     }
 
     <!-- SUMMARY VIEW -->
     @if (appMode() === 'summary') {
-      <div class="flex flex-col items-center justify-center w-full h-full animate-fade-in gap-6">
-        <div class="text-6xl mb-4">🎉</div>
-        <h2 class="text-3xl font-bold text-slate-800">測驗結束！</h2>
+      <div class="flex flex-col items-center justify-center w-full h-full animate-fade-in gap-4 p-4">
+        <div class="text-5xl">🎉</div>
+        <h2 class="text-2xl font-bold text-slate-800">測驗結束！</h2>
         
         <div class="bg-white p-6 rounded-3xl shadow-lg w-full text-center border-b-4 border-slate-100">
-          <div class="text-gray-500 mb-2">你的總分</div>
-          <div class="text-6xl font-bold text-indigo-600 mb-6">{{ score() }}</div>
+          <div class="text-gray-500 mb-1">你的總分</div>
+          <div class="text-5xl font-bold text-indigo-600 mb-4">{{ score() }}</div>
           
           <div class="text-left">
-            <label class="block text-sm font-bold text-slate-700 mb-2">輸入你的名字:</label>
+            <label class="block text-sm font-bold text-slate-700 mb-1">輸入名字:</label>
             <input type="text" 
               [ngModel]="playerName()" 
               (ngModelChange)="playerName.set($event)"
               placeholder="例如: 小明" 
-              class="w-full p-4 rounded-xl border-2 border-slate-200 text-lg focus:border-indigo-500 outline-none">
+              class="w-full p-3 rounded-xl border-2 border-slate-200 text-lg focus:border-indigo-500 outline-none">
           </div>
         </div>
 
@@ -228,19 +215,19 @@
 
     <!-- LEADERBOARD VIEW -->
     @if (appMode() === 'leaderboard') {
-      <div class="flex flex-col w-full h-full animate-fade-in">
-        <h2 class="text-2xl font-bold text-slate-800 mb-4 text-center">🏆 排行榜</h2>
+      <div class="flex flex-col w-full h-full animate-fade-in pb-2">
+        <h2 class="text-xl font-bold text-slate-800 mb-2 text-center shrink-0">🏆 排行榜</h2>
         
-        <div class="bg-white rounded-3xl shadow-lg w-full overflow-hidden flex-1 mb-4 flex flex-col">
-          <div class="p-4 bg-indigo-50 border-b border-indigo-100 grid grid-cols-12 gap-2 text-sm font-bold text-indigo-900">
+        <div class="bg-white rounded-2xl shadow-lg w-full overflow-hidden flex-1 mb-2 flex flex-col min-h-0">
+          <div class="p-3 bg-indigo-50 border-b border-indigo-100 grid grid-cols-12 gap-2 text-sm font-bold text-indigo-900 shrink-0">
             <div class="col-span-2">#</div>
             <div class="col-span-5">姓名</div>
             <div class="col-span-5 text-right">分數</div>
           </div>
           
-          <div class="overflow-y-auto flex-1">
+          <div class="overflow-y-auto flex-1 p-0">
             @for (entry of leaderboardData(); track $index) {
-              <div class="p-4 border-b border-slate-100 grid grid-cols-12 gap-2 items-center" 
+              <div class="p-3 border-b border-slate-100 grid grid-cols-12 gap-2 items-center" 
                    [class.bg-yellow-50]="$index < 3">
                 <div class="col-span-2 font-bold text-slate-500">
                   @if ($index === 0) { 🥇 }
@@ -248,12 +235,12 @@
                   @else if ($index === 2) { 🥉 }
                   @else { {{ $index + 1 }} }
                 </div>
-                <div class="col-span-5 font-bold text-slate-800 truncate">{{ entry.name }}</div>
+                <div class="col-span-5 font-bold text-slate-800 truncate text-sm">{{ entry.name }}</div>
                 <div class="col-span-5 text-right font-mono text-indigo-600 font-bold">{{ entry.score }}</div>
               </div>
             }
             @if (leaderboardData().length === 0) {
-              <div class="p-8 text-center text-gray-400">
+              <div class="p-8 text-center text-gray-400 text-sm">
                 目前還沒有紀錄，快去挑戰吧！
               </div>
             }
@@ -261,12 +248,11 @@
         </div>
 
         <button (click)="returnToMenu()" 
-          class="w-full py-4 rounded-2xl bg-slate-200 text-slate-700 font-bold text-xl shadow hover:bg-slate-300">
+          class="shrink-0 w-full py-3 rounded-xl bg-slate-200 text-slate-700 font-bold text-lg shadow hover:bg-slate-300">
           回主選單
         </button>
       </div>
     }
 
   </main>
-
 </div>

@@ -1,7 +1,5 @@
 {
   "name": "數學大師五年級",
   "description": "專為五年級學生設計的趣味數學練習 APP，包含加法、減法與估商練習，並具備 AI 輔助教學功能。",
-  "requestFramePermissions": [
-    "microphone"
-  ]
+  "requestFramePermissions": []
 }

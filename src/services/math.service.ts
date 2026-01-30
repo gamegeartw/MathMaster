@@ -5,6 +5,9 @@ export interface MathProblem {
   questionStr: string;
   answer: number;
   hintPrompt: string; // For GenAI
+  // Added for specific logic hints
+  operand1: number; 
+  operand2: number;
 }
 
 @Injectable({
@@ -24,7 +27,9 @@ export class MathService {
       type: 'add',
       questionStr: `${a} + ${b} = ?`,
       answer: a + b,
-      hintPrompt: `請用繁體中文，簡單地向小學五年級學生解釋如何計算 ${a} 加 ${b}。`
+      hintPrompt: `請用繁體中文，簡單地向小學五年級學生解釋如何計算 ${a} 加 ${b}。`,
+      operand1: a,
+      operand2: b
     };
   }
 
@@ -39,7 +44,9 @@ export class MathService {
       type: 'sub',
       questionStr: `${a} - ${b} = ?`,
       answer: a - b,
-      hintPrompt: `請用繁體中文，簡單地向小學五年級學生解釋如何計算 ${a} 減 ${b}。`
+      hintPrompt: `請用繁體中文，簡單地向小學五年級學生解釋如何計算 ${a} 減 ${b}。`,
+      operand1: a,
+      operand2: b
     };
   }
 
@@ -59,7 +66,9 @@ export class MathService {
       type: 'div',
       questionStr: `${dividend} ÷ ${divisor} = ?`,
       answer: answer,
-      hintPrompt: `請用繁體中文，簡單解釋如何估算 ${dividend} 除以 ${divisor} 的商數。只要教學生找出整數部分的商即可。`
+      hintPrompt: `請用繁體中文，簡單解釋如何估算 ${dividend} 除以 ${divisor} 的商數。只要教學生找出整數部分的商即可。`,
+      operand1: dividend, // 被除數
+      operand2: divisor   // 除數
     };
   }
 

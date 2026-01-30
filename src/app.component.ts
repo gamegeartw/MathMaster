@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MathService, MathProblem } from './services/math.service';
 import { AiTutorService } from './services/ai-tutor.service';
-import { VoiceService } from './services/voice.service';
 import { LeaderboardService, ScoreEntry } from './services/leaderboard.service';
 
 type AppMode = 'menu' | 'div-select' | 'game' | 'summary' | 'leaderboard';
@@ -19,7 +18,6 @@ type MathMode = 'add' | 'sub' | 'div' | 'mixed';
 export class AppComponent {
   mathService = inject(MathService);
   aiService = inject(AiTutorService);
-  voiceService = inject(VoiceService);
   leaderboardService = inject(LeaderboardService);
 
   // --- State Signals ---
@@ -188,56 +186,15 @@ export class AppComponent {
     this.userAnswer.set(current.slice(0, -1));
   }
 
-  toggleVoiceInput() {
-    this.voiceService.startListening((transcript) => {
-      // Basic Chinese Number Parsing
-      const parsed = this.parseChineseNumber(transcript);
-      if (parsed !== null) {
-         this.userAnswer.set(parsed.toString());
-      } else {
-        // Fallback: try to just keep digits
-        const digits = transcript.replace(/\D/g, '');
-        if (digits) {
-          this.userAnswer.set(digits);
-        }
-      }
-    });
-  }
-
-  // Simple Chinese Text to Number helper (supports simple spoken numbers like "二十五", "38")
-  parseChineseNumber(text: string): number | null {
-    // If it's already digits
-    if (!isNaN(Number(text))) return Number(text);
-
-    // Try extracting digits first
-    const match = text.match(/\d+/);
-    if (match) return parseInt(match[0], 10);
-
-    // Simple mapping for single digits
-    const map: Record<string, number> = {
-      '一': 1, '二': 2, '兩': 2, '三': 3, '四': 4, '五': 5, '六': 6, '七': 7, '八': 8, '九': 9, '十': 10, '零': 0
-    };
-    
-    // Loop through map to see if the text contains any of these
-    // This is a very basic fuzzy check for single digits said in Chinese
-    for (const key in map) {
-      if (text.includes(key)) {
-        return map[key];
-      }
-    }
-
-    return null; // Fail
-  }
-
   checkAnswer() {
     const problem = this.currentProblem();
     if (!problem || !this.userAnswer()) return;
     
-    this.stopTimer();
-
     const val = parseInt(this.userAnswer(), 10);
-    
-    if (val === problem.answer) {
+    const correct = problem.answer;
+
+    if (val === correct) {
+      this.stopTimer();
       this.feedbackType.set('success');
       this.feedbackMessage.set('答對了！太棒了！ 🎉');
       this.score.update(s => s + 10);
@@ -245,13 +202,44 @@ export class AppComponent {
         this.nextQuestion();
       }, 1500);
     } else {
+      // WRONG ANSWER - Logic-based Feedback
       this.feedbackType.set('error');
-      this.feedbackMessage.set('再試一次喔！加油！');
       this.score.update(s => Math.max(0, s - 5));
       this.userAnswer.set('');
-       this.timerInterval = setInterval(() => {
-        this.timerSeconds.update(s => s + 1);
-      }, 1000);
+
+      // Generate specific helpful hint
+      let msg = '再試一次喔！';
+      
+      if (problem.type === 'div') {
+        const dividend = problem.operand1;
+        const divisor = problem.operand2;
+        const check = divisor * val;
+
+        if (val > correct) {
+          // Guess too high: check (divisor * val) > dividend
+          msg = `太大囉！ ${divisor} × ${val} = ${check}，比 ${dividend} 還大！`;
+        } else {
+          // Guess too low: remainder is too big
+          const remainder = dividend - check;
+          msg = `太小囉！ ${divisor} × ${val} = ${check}，剩下的 ${remainder} 夠再分喔！`;
+        }
+      } else {
+        // Addition / Subtraction
+        if (val > correct) {
+          msg = '太大囉！試著數字小一點 👇';
+        } else {
+          msg = '太小囉！試著數字大一點 👆';
+        }
+      }
+      
+      this.feedbackMessage.set(msg);
+
+      // Keep timer running if wrong
+      if (!this.timerInterval) {
+         this.timerInterval = setInterval(() => {
+          this.timerSeconds.update(s => s + 1);
+        }, 1000);
+      }
     }
   }
 
