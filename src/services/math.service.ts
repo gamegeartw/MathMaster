@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { I18nService } from './i18n.service';
 
 export interface MathProblem {
   type: 'add' | 'sub' | 'div' | 'mul';
@@ -14,6 +15,7 @@ export interface MathProblem {
   providedIn: 'root'
 })
 export class MathService {
+  i18n = inject(I18nService);
 
   getRandomInt(min: number, max: number): number {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -27,7 +29,7 @@ export class MathService {
       type: 'add',
       questionStr: `${a} + ${b} = ?`,
       answer: a + b,
-      hintPrompt: `請用繁體中文，簡單地向小學五年級學生解釋如何計算 ${a} 加 ${b}。`,
+      hintPrompt: this.i18n.t('addHintPrompt', { a, b }),
       operand1: a,
       operand2: b
     };
@@ -44,7 +46,7 @@ export class MathService {
       type: 'sub',
       questionStr: `${a} - ${b} = ?`,
       answer: a - b,
-      hintPrompt: `請用繁體中文，簡單地向小學五年級學生解釋如何計算 ${a} 減 ${b}。`,
+      hintPrompt: this.i18n.t('subHintPrompt', { a, b }),
       operand1: a,
       operand2: b
     };
@@ -66,7 +68,7 @@ export class MathService {
       type: 'div',
       questionStr: `${dividend} ÷ ${divisor} = ?`,
       answer: answer,
-      hintPrompt: `請用繁體中文，簡單解釋如何估算 ${dividend} 除以 ${divisor} 的商數。只要教學生找出整數部分的商即可。`,
+      hintPrompt: this.i18n.t('divHintPrompt', { dividend, divisor }),
       operand1: dividend, // 被除數
       operand2: divisor   // 除數
     };

@@ -1,7 +1,8 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ScoreEntry } from '../../services/leaderboard.service';
 import { MathMode } from '../../app.types';
+import { I18nService } from '../../services/i18n.service';
 
 @Component({
   selector: 'app-leaderboard',
@@ -9,15 +10,15 @@ import { MathMode } from '../../app.types';
   imports: [CommonModule],
   template: `
     <div class="flex flex-col w-full h-full animate-fade-in pb-2">
-      <h2 class="text-xl font-bold text-slate-800 mb-2 text-center shrink-0">🏆 排行榜</h2>
+      <h2 class="text-xl font-bold text-slate-800 mb-2 text-center shrink-0">{{ i18n.t('leaderboardTitle') }}</h2>
       
       <div class="bg-white rounded-2xl shadow-lg w-full overflow-hidden flex-1 mb-2 flex flex-col min-h-0">
         <div class="p-3 bg-indigo-50 border-b border-indigo-100 grid grid-cols-12 gap-2 text-xs sm:text-sm font-bold text-indigo-900 shrink-0">
-          <div class="col-span-1">#</div>
-          <div class="col-span-4">姓名</div>
-          <div class="col-span-3 text-center">模式</div>
-          <div class="col-span-2 text-center">時間</div>
-          <div class="col-span-2 text-right">分數</div>
+          <div class="col-span-1">{{ i18n.t('rank') }}</div>
+          <div class="col-span-4">{{ i18n.t('name') }}</div>
+          <div class="col-span-3 text-center">{{ i18n.t('mode') }}</div>
+          <div class="col-span-2 text-center">{{ i18n.t('time') }}</div>
+          <div class="col-span-2 text-right">{{ i18n.t('score') }}</div>
         </div>
         
         <div class="overflow-y-auto flex-1 p-0">
@@ -42,7 +43,7 @@ import { MathMode } from '../../app.types';
           }
           @if (leaderboardData().length === 0) {
             <div class="p-8 text-center text-gray-400 text-sm">
-              目前還沒有紀錄，快去挑戰吧！
+              {{ i18n.t('noRecords') }}
             </div>
           }
         </div>
@@ -50,7 +51,7 @@ import { MathMode } from '../../app.types';
 
       <button (click)="backClicked.emit()" 
         class="shrink-0 w-full py-3 rounded-xl bg-slate-200 text-slate-700 font-bold text-lg shadow hover:bg-slate-300">
-        回主選單
+        {{ i18n.t('mainMenu') }}
       </button>
     </div>
   `
@@ -59,13 +60,15 @@ export class LeaderboardComponent {
   leaderboardData = input.required<ScoreEntry[]>();
   backClicked = output<void>();
 
+  i18n = inject(I18nService);
+
   getModeDisplayName(mode: MathMode): string {
     switch (mode) {
-      case MathMode.Add: return '加法';
-      case MathMode.Sub: return '減法';
-      case MathMode.Div: return '估商';
-      case MathMode.Mixed: return '綜合';
-      default: return '未知';
+      case MathMode.Add: return this.i18n.t('addition');
+      case MathMode.Sub: return this.i18n.t('subtraction');
+      case MathMode.Div: return this.i18n.t('division');
+      case MathMode.Mixed: return this.i18n.t('mixed');
+      default: return '?';
     }
   }
 

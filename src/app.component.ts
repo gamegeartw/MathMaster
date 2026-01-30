@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { MathService, MathProblem } from './services/math.service';
 import { AiTutorService } from './services/ai-tutor.service';
 import { LeaderboardService, ScoreEntry } from './services/leaderboard.service';
+import { I18nService } from './services/i18n.service';
 
 import { MenuComponent } from './components/menu/menu.component';
 import { DivisorSelectComponent } from './components/divisor-select/divisor-select.component';
@@ -31,6 +32,7 @@ export class AppComponent {
   mathService = inject(MathService);
   aiService = inject(AiTutorService);
   leaderboardService = inject(LeaderboardService);
+  i18n = inject(I18nService);
 
   // Expose enums to template
   AppMode = AppMode;
@@ -70,14 +72,15 @@ export class AppComponent {
   // --- Computed ---
   modeTitle = computed(() => {
     switch (this.selectedMathMode()) {
-      case MathMode.Add: return '加法練習';
-      case MathMode.Sub: return '減法練習';
+      case MathMode.Add: return this.i18n.t('addPractice');
+      case MathMode.Sub: return this.i18n.t('subPractice');
       case MathMode.Div: 
-        return this.specificDivisor() 
-          ? `估商練習 (${this.specificDivisor()})` 
-          : '估商練習';
-      case MathMode.Mixed: return '綜合挑戰';
-      default: return '數學大師';
+        const divisor = this.specificDivisor();
+        return divisor
+          ? this.i18n.t('divPracticeWithNum', { divisor })
+          : this.i18n.t('divPractice');
+      case MathMode.Mixed: return this.i18n.t('mixedChallenge');
+      default: return this.i18n.t('appTitle');
     }
   });
 
@@ -209,13 +212,13 @@ export class AppComponent {
     const problem = this.currentProblem();
     if (!problem || !this.userAnswer()) return;
     
-    const val = parseInt(this.userAnswer(), 10);
+    const guess = parseInt(this.userAnswer(), 10);
     const correct = problem.answer;
 
-    if (val === correct) {
+    if (guess === correct) {
       this.stopTimer();
       this.feedbackType.set('success');
-      this.feedbackMessage.set('答對了！太棒了！ 🎉');
+      this.feedbackMessage.set(this.i18n.t('correct'));
       this.score.update(s => s + 10);
       setTimeout(() => {
         this.nextQuestion();
@@ -225,19 +228,19 @@ export class AppComponent {
       this.score.update(s => Math.max(0, s - 5));
       this.userAnswer.set('');
 
-      let msg = '再試一次喔！';
+      let msg = this.i18n.t('tryAgain');
       if (problem.type === 'div') {
         const dividend = problem.operand1;
         const divisor = problem.operand2;
-        const check = divisor * val;
-        if (val > correct) {
-          msg = `太大囉！ ${divisor} × ${val} = ${check}，比 ${dividend} 還大！`;
+        const result = divisor * guess;
+        if (guess > correct) {
+          msg = this.i18n.t('divGuessTooHigh', { divisor, guess, result, dividend });
         } else {
-          const remainder = dividend - check;
-          msg = `太小囉！ ${divisor} × ${val} = ${check}，剩下的 ${remainder} 夠再分喔！`;
+          const remainder = dividend - result;
+          msg = this.i18n.t('divGuessTooLow', { divisor, guess, result, remainder });
         }
       } else {
-        msg = val > correct ? '太大囉！試著數字小一點 👇' : '太小囉！試著數字大一點 👆';
+        msg = guess > correct ? this.i18n.t('guessTooHigh') : this.i18n.t('guessTooLow');
       }
       this.feedbackMessage.set(msg);
 

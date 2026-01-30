@@ -4,20 +4,20 @@
   <header class="w-full shrink-0 flex justify-between items-center mb-2 bg-white px-4 py-2 rounded-xl shadow-sm z-10 h-14">
     @if (appMode() === AppMode.Game) {
       <button (click)="returnToMenu()" class="text-gray-500 hover:text-gray-800 font-bold px-2 py-1 text-sm bg-gray-100 rounded-lg">
-        ← 放棄
+        ← {{ i18n.t('quit') }}
       </button>
       <div class="flex items-center gap-2">
-        <span class="text-xs font-bold text-gray-400 hidden sm:inline">第 {{ questionCount() }}/{{ totalQuestions() }} 題</span>
+        <span class="text-xs font-bold text-gray-400 hidden sm:inline">{{ i18n.t('questionProgress', { current: questionCount(), total: totalQuestions() }) }}</span>
         <span class="text-xs font-bold text-gray-400 sm:hidden">{{ questionCount() }}/{{ totalQuestions() }}</span>
         <div class="bg-yellow-100 px-3 py-1 rounded-full text-yellow-800 font-bold border border-yellow-300 text-sm">
-          {{ score() }}分
+          {{ score() }}{{ i18n.t('score') }}
         </div>
       </div>
     } @else {
       <button *ngIf="appMode() !== AppMode.Menu" (click)="returnToMenu()" class="text-gray-500 hover:text-gray-800 font-bold p-2">
-        ← 主選單
+        ← {{ i18n.t('mainMenu') }}
       </button>
-      <span *ngIf="appMode() === AppMode.Menu" class="text-lg font-bold text-indigo-600">數學大師五年級</span>
+      <span *ngIf="appMode() === AppMode.Menu" class="text-lg font-bold text-indigo-600">{{ i18n.t('appTitle') }}</span>
     }
   </header>
 

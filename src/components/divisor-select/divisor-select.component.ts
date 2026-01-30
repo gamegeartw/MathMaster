@@ -1,11 +1,12 @@
-import { Component, output } from '@angular/core';
+import { Component, output, inject } from '@angular/core';
+import { I18nService } from '../../services/i18n.service';
 
 @Component({
   selector: 'app-divisor-select',
   standalone: true,
   template: `
     <div class="flex flex-col gap-3 w-full h-full animate-fade-in overflow-y-auto">
-      <h1 class="text-xl font-bold text-center text-slate-800 shrink-0">選擇估商數字</h1>
+      <h1 class="text-xl font-bold text-center text-slate-800 shrink-0">{{ i18n.t('selectDivisor') }}</h1>
       
       <div class="grid grid-cols-2 gap-3 flex-1 content-start">
         @for (num of divisors; track num) {
@@ -17,7 +18,7 @@ import { Component, output } from '@angular/core';
       </div>
 
       <button (click)="returnToMenu()" class="shrink-0 mb-2 w-full py-3 text-slate-400 font-bold border border-slate-200 rounded-xl">
-        取消返回
+        {{ i18n.t('cancelAndReturn') }}
       </button>
     </div>
   `
@@ -25,7 +26,8 @@ import { Component, output } from '@angular/core';
 export class DivisorSelectComponent {
   divisorSelected = output<number>();
   backClicked = output<void>();
-
+  
+  i18n = inject(I18nService);
   divisors = [2, 3, 4, 5, 6, 7, 8, 9];
 
   selectDivisor(num: number) {

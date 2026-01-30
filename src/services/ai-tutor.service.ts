@@ -1,11 +1,13 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { GoogleGenAI } from "@google/genai";
+import { I18nService } from './i18n.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AiTutorService {
   private ai: GoogleGenAI;
+  private i18n = inject(I18nService);
 
   constructor() {
     // Use dot notation strictly as per guidelines
@@ -19,13 +21,13 @@ export class AiTutorService {
         model: 'gemini-2.5-flash',
         contents: prompt,
         config: {
-          systemInstruction: "你是一位親切、充滿鼓勵的台灣國小數學老師。請用繁體中文（台灣用語）回答。解釋要非常簡短（最多3句話），簡單易懂且有趣。",
+          systemInstruction: this.i18n.t('aiSystemInstruction'),
         }
       });
-      return response.text || "抱歉，我現在想不出提示！";
+      return response.text || this.i18n.t('aiHintError');
     } catch (error) {
       console.error('AI Error:', error);
-      return "哎呀！我現在腦袋在休息，你自己試試看吧！";
+      return this.i18n.t('aiGenericError');
     }
   }
 }

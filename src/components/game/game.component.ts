@@ -1,6 +1,7 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MathProblem } from '../../services/math.service';
+import { I18nService } from '../../services/i18n.service';
 
 @Component({
   selector: 'app-game',
@@ -36,7 +37,7 @@ import { MathProblem } from '../../services/math.service';
               🤖 {{ aiHint() }}
             </div>
           } @else if (isLoadingAi()) {
-            <div class="text-purple-500 text-xs animate-pulse">思考中...</div>
+            <div class="text-purple-500 text-xs animate-pulse">{{ i18n.t('thinking') }}...</div>
           }
         </div>
       </div>
@@ -53,7 +54,7 @@ import { MathProblem } from '../../services/math.service';
           
           <button (click)="helpRequested.emit()" 
             class="h-14 sm:h-16 bg-purple-50 rounded-xl shadow-sm text-purple-600 font-bold text-sm flex flex-col items-center justify-center active:bg-purple-100 border-b-4 border-purple-100 active:border-b-0 active:translate-y-1 transition-all">
-            <span>💡AI老師</span>
+            <span>{{ i18n.t('aiTeacher') }}</span>
           </button>
           
           <button (click)="numberAppended.emit(0)" 
@@ -71,7 +72,7 @@ import { MathProblem } from '../../services/math.service';
           [disabled]="userAnswer().length === 0"
           [class]="userAnswer().length > 0 ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg border-b-4 border-indigo-800 active:border-b-0 active:translate-y-1' : 'bg-slate-300 text-white cursor-not-allowed border-b-4 border-slate-400'"
           class="w-full h-14 sm:h-16 rounded-2xl text-2xl font-bold transition-all duration-100 flex items-center justify-center gap-2">
-          送出答案
+          {{ i18n.t('submitAnswer') }}
         </button>
       </div>
     </div>
@@ -96,5 +97,6 @@ export class GameComponent {
   numberAppended = output<number>();
   backspaceClicked = output<void>();
 
+  i18n = inject(I18nService);
   keypadNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 }

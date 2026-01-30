@@ -1,6 +1,7 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MathMode } from '../../app.types';
+import { I18nService } from '../../services/i18n.service';
 
 @Component({
   selector: 'app-menu',
@@ -12,52 +13,52 @@ import { MathMode } from '../../app.types';
       <div class="w-full bg-white p-3 rounded-xl shadow-sm border border-slate-200 shrink-0">
         <div class="flex items-center justify-between">
             <label class="text-slate-600 font-bold text-sm">
-            ⚙️ 每回合題數
+            {{ i18n.t('questionsPerRound') }}
           </label>
           <input type="number" 
             min="0"
             [ngModel]="customQuestionCount()" 
             (ngModelChange)="handleCustomQuestionCountChange($event)" 
-            placeholder="預設"
+            [placeholder]="i18n.t('default')"
             class="w-20 p-1 rounded-lg border-2 border-slate-200 focus:border-indigo-500 outline-none text-center font-bold text-sm">
         </div>
       </div>
 
-      <h1 class="text-xl font-bold text-center text-slate-800 my-1 shrink-0">請選擇練習模式</h1>
+      <h1 class="text-xl font-bold text-center text-slate-800 my-1 shrink-0">{{ i18n.t('selectMode') }}</h1>
       
       <div class="grid grid-cols-2 gap-3 flex-1 min-h-0 content-start">
         <button (click)="selectMode(MathMode.Add)" 
           class="aspect-[4/3] rounded-2xl bg-blue-500 hover:bg-blue-600 text-white shadow-lg transform transition active:scale-95 flex flex-col items-center justify-center gap-1 p-2">
           <span class="text-3xl">➕</span> 
-          <span class="text-xl font-bold">加法</span>
+          <span class="text-xl font-bold">{{ i18n.t('addition') }}</span>
         </button>
 
         <button (click)="selectMode(MathMode.Sub)" 
           class="aspect-[4/3] rounded-2xl bg-green-500 hover:bg-green-600 text-white shadow-lg transform transition active:scale-95 flex flex-col items-center justify-center gap-1 p-2">
           <span class="text-3xl">➖</span> 
-          <span class="text-xl font-bold">減法</span>
+          <span class="text-xl font-bold">{{ i18n.t('subtraction') }}</span>
         </button>
 
         <button (click)="selectMode(MathMode.Div)" 
           class="aspect-[4/3] rounded-2xl bg-purple-500 hover:bg-purple-600 text-white shadow-lg transform transition active:scale-95 flex flex-col items-center justify-center gap-1 p-2">
           <span class="text-3xl">➗</span> 
-          <span class="text-xl font-bold">估商</span>
+          <span class="text-xl font-bold">{{ i18n.t('division') }}</span>
         </button>
         
         <button (click)="selectMode(MathMode.Mixed)" 
           class="aspect-[4/3] rounded-2xl bg-orange-500 hover:bg-orange-600 text-white shadow-lg transform transition active:scale-95 flex flex-col items-center justify-center gap-1 p-2">
           <span class="text-3xl">🎲</span> 
-          <span class="text-xl font-bold">綜合</span>
+          <span class="text-xl font-bold">{{ i18n.t('mixed') }}</span>
         </button>
       </div>
 
       <button (click)="showLeaderboard()" 
         class="shrink-0 w-full py-3 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold shadow flex items-center justify-center gap-2">
-        <span>🏆</span> 查看排行榜
+        {{ i18n.t('viewLeaderboard') }}
       </button>
 
       <div class="shrink-0 text-center text-gray-400 text-xs">
-        適用五年級 • 範圍 21-70
+        {{ i18n.t('appDescription') }}
       </div>
     </div>
   `
@@ -68,6 +69,7 @@ export class MenuComponent {
   modeSelected = output<MathMode>();
   leaderboardClicked = output<void>();
 
+  i18n = inject(I18nService);
   MathMode = MathMode;
 
   handleCustomQuestionCountChange(value: number | null) {
