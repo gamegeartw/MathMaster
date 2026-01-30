@@ -24,8 +24,9 @@ export const zhTW = {
   cancelAndReturn: '取消返回',
 
   // Game Component
-  aiTeacher: '💡AI老師',
+  aiTeacher: 'AI老師',
   thinking: '思考中...',
+  stopSpeaking: '停止',
 
   // Summary Component
   quizComplete: '測驗結束！',

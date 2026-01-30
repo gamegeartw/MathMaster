@@ -5,6 +5,7 @@ import { MathService, MathProblem } from './services/math.service';
 import { AiTutorService } from './services/ai-tutor.service';
 import { LeaderboardService, ScoreEntry } from './services/leaderboard.service';
 import { I18nService } from './services/i18n.service';
+import { VoiceService } from './services/voice.service';
 
 import { MenuComponent } from './components/menu/menu.component';
 import { DivisorSelectComponent } from './components/divisor-select/divisor-select.component';
@@ -33,6 +34,7 @@ export class AppComponent {
   aiService = inject(AiTutorService);
   leaderboardService = inject(LeaderboardService);
   i18n = inject(I18nService);
+  voiceService = inject(VoiceService);
 
   // Expose enums to template
   AppMode = AppMode;
@@ -57,6 +59,7 @@ export class AppComponent {
   feedbackType = signal<'success' | 'error' | 'neutral'>('neutral');
   aiHint = signal<string>('');
   isLoadingAi = signal<boolean>(false);
+  isSpeaking = this.voiceService.isSpeaking; // 建立一個唯讀 signal 來追蹤語音服務的狀態
 
   // Timers
   timerSeconds = signal<number>(0);
@@ -154,10 +157,11 @@ export class AppComponent {
 
   /**
    * @description 返回主選單。
-   * @description 會停止計時器並重設所有遊戲相關的狀態。
+   * @description 會停止計時器、停止語音並重設所有遊戲相關的狀態。
    */
   returnToMenu() {
     this.stopTimer();
+    this.voiceService.cancel();
     this.appMode.set(AppMode.Menu);
     this.currentProblem.set(null);
     this.userAnswer.set('');
@@ -177,6 +181,7 @@ export class AppComponent {
     }
 
     this.stopTimer();
+    this.voiceService.cancel();
     this.questionCount.update(c => c + 1);
     
     this.userAnswer.set('');
@@ -222,6 +227,7 @@ export class AppComponent {
     this.sessionTotalTimeSeconds.set(durationSeconds);
 
     this.stopTimer();
+    this.voiceService.cancel();
     this.appMode.set(AppMode.Summary);
   }
 
@@ -261,6 +267,7 @@ export class AppComponent {
 
     if (guess === correct) {
       this.stopTimer();
+      this.voiceService.cancel();
       this.feedbackType.set('success');
       this.feedbackMessage.set(this.i18n.t('correct'));
       this.score.update(s => s + 10);
@@ -297,8 +304,8 @@ export class AppComponent {
   }
 
   /**
-   * @description 向 AI 老師請求幫助。
-   * @description 會呼叫 AI Tutor 服務來取得目前問題的提示。
+   * @description 向 AI 老師請求幫助並朗讀提示。
+   * @description 會呼叫 AI Tutor 服務來取得提示，然後使用 VoiceService 朗讀出來。
    */
   async askForHelp() {
     const problem = this.currentProblem();
@@ -306,9 +313,23 @@ export class AppComponent {
 
     this.isLoadingAi.set(true);
     this.aiHint.set('');
-    const hint = await this.aiService.getExplanation(problem.hintPrompt);
-    this.aiHint.set(hint);
-    this.isLoadingAi.set(false);
+    try {
+      const hint = await this.aiService.getExplanation(problem.hintPrompt);
+      this.aiHint.set(hint);
+      this.isLoadingAi.set(false);
+      // 成功取得提示後，立即朗讀
+      await this.voiceService.speak(hint, 'zh-TW');
+    } catch (error) {
+      console.error('Failed to get or speak AI hint:', error);
+      this.isLoadingAi.set(false);
+    }
+  }
+
+  /**
+   * @description 停止 AI 老師的朗讀。
+   */
+  stopSpeech() {
+    this.voiceService.cancel();
   }
 
   // --- Leaderboard Logic ---
