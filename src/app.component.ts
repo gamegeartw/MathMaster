@@ -41,9 +41,11 @@ export class AppComponent {
   aiHint = signal<string>('');
   isLoadingAi = signal<boolean>(false);
 
-  // Timer
-  timerSeconds = signal<number>(0);
+  // Timers
+  timerSeconds = signal<number>(0); // Per question
   timerInterval: any;
+  sessionStartTime = signal<number>(0);
+  sessionTotalTimeSeconds = signal<number>(0);
   isTimeWarning = computed(() => this.timerSeconds() > 30);
 
   // Leaderboard
@@ -67,6 +69,16 @@ export class AppComponent {
   constructor() {}
 
   // --- Game Flow ---
+
+  handleCustomQuestionCountChange(value: number | null) {
+    // The input type="number" can emit null if empty.
+    // We prevent negative numbers. 0 is allowed for default.
+    if (value !== null && value < 0) {
+      this.customQuestionCount.set(null); // Reset to show placeholder
+    } else {
+      this.customQuestionCount.set(value);
+    }
+  }
 
   // Step 1: Menu selection
   selectMode(mode: MathMode) {
@@ -108,6 +120,7 @@ export class AppComponent {
     this.appMode.set('game');
     this.score.set(0);
     this.questionCount.set(0);
+    this.sessionStartTime.set(Date.now()); // Start session timer
     this.nextQuestion();
   }
 
@@ -151,7 +164,7 @@ export class AppComponent {
     }
     this.currentProblem.set(problem);
 
-    // Start Timer
+    // Start Timer for the question
     this.timerSeconds.set(0);
     this.timerInterval = setInterval(() => {
       this.timerSeconds.update(s => s + 1);
@@ -166,6 +179,10 @@ export class AppComponent {
   }
 
   finishGame() {
+    const endTime = Date.now();
+    const durationSeconds = Math.round((endTime - this.sessionStartTime()) / 1000);
+    this.sessionTotalTimeSeconds.set(durationSeconds);
+
     this.stopTimer();
     this.appMode.set('summary');
   }
@@ -264,8 +281,9 @@ export class AppComponent {
     const entry: ScoreEntry = {
       name: this.playerName().trim(),
       score: this.score(),
-      mode: this.modeTitle(),
-      date: new Date()
+      mode: this.selectedMathMode(), // 'add', 'sub', etc.
+      date: new Date(),
+      timeSpentSeconds: this.sessionTotalTimeSeconds()
     };
 
     await this.leaderboardService.addScore(entry);
@@ -276,5 +294,22 @@ export class AppComponent {
     this.appMode.set('leaderboard');
     const data = await this.leaderboardService.getTopScores();
     this.leaderboardData.set(data);
+  }
+
+  // Helper for display
+  getModeDisplayName(mode: string): string {
+    switch (mode) {
+      case 'add': return '加法';
+      case 'sub': return '減法';
+      case 'div': return '估商';
+      case 'mixed': return '綜合';
+      default: return '未知';
+    }
+  }
+
+  formatTime(totalSeconds: number): string {
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   }
 }

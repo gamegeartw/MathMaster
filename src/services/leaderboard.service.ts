@@ -7,6 +7,7 @@ export interface ScoreEntry {
   score: number;
   mode: string;
   date: Date;
+  timeSpentSeconds: number;
 }
 
 @Injectable({
@@ -82,7 +83,8 @@ export class LeaderboardService {
           name: data['name'],
           score: data['score'],
           mode: data['mode'],
-          date: (data['date'] as Timestamp).toDate()
+          date: (data['date'] as Timestamp).toDate(),
+          timeSpentSeconds: data['timeSpentSeconds'] || 0
         };
       });
     } catch (e) {
