@@ -16,7 +16,7 @@
 
   <h1 class="text-xl font-bold text-center text-slate-800 my-1 shrink-0">{{ i18n.t('selectMode') }}</h1>
   
-  <div class="grid grid-cols-2 gap-3 flex-1 min-h-0 content-start">
+  <div class="grid grid-cols-2 gap-3 content-start">
     <button (click)="selectMode(MathMode.Add)" 
       class="aspect-[4/3] rounded-2xl bg-blue-500 hover:bg-blue-600 text-white shadow-lg transform transition active:scale-95 flex flex-col items-center justify-center gap-1 p-2">
       <span class="text-3xl">➕</span> 
@@ -47,16 +47,19 @@
       <span class="text-xl font-bold">{{ i18n.t('mixed') }}</span>
     </button>
   </div>
+  
+  <!-- Footer section pushed to the bottom -->
+  <div class="mt-auto pt-2 shrink-0 flex flex-col items-center gap-2">
+    <button (click)="showLeaderboard()" 
+      class="w-full py-3 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold shadow flex items-center justify-center gap-2">
+      {{ i18n.t('viewLeaderboard') }}
+    </button>
 
-  <button (click)="showLeaderboard()" 
-    class="shrink-0 w-full py-3 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold shadow flex items-center justify-center gap-2">
-    {{ i18n.t('viewLeaderboard') }}
-  </button>
-
-  <div class="shrink-0 text-center text-gray-400 text-xs">
-    {{ i18n.t('appDescription') }}
+    <div class="text-center text-gray-400 text-xs">
+      {{ i18n.t('appDescription') }}
+    </div>
+    <button (click)="versionClicked.emit()" class="text-center text-gray-300 hover:text-gray-500 text-xs transition-colors">
+      {{ version() }}
+    </button>
   </div>
-  <button (click)="versionClicked.emit()" class="shrink-0 text-center text-gray-300 hover:text-gray-500 text-xs mt-1 transition-colors">
-    {{ version() }}
-  </button>
 </div>
