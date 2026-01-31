@@ -26,7 +26,7 @@
 
 ### 🧱 現代化的元件架構 (Component-Driven Architecture)
 
-- **關注點分離 (Separation of Concerns)**：將應用程式切分為多個獨立、可複用的元件（Components）。每個元件都有明確的職責，例如 `MenuComponent` 負責主選單，`GameComponent` 負責遊戲介面。
+- **關注點分離 (Separation of Concerns)**：將應用程式切分為多個獨立、可複用的元件（Components）。每個元件都有明確的職責，例如 `MenuComponent` 負責主選單，`GameComponent`  responsible for the game interface.
 - **智慧容器 vs. 展示元件**：`AppComponent` 作為核心的「智慧容器 (Smart Container)」，負責管理整個 App 的狀態（State）和核心商業 logique。而 `components/` 目錄下的元件則為「展示元件 (Presentational Components)」，它們只負責接收資料並呈現 UI，大幅降低了程式碼的複雜度。
 
 ### 🚀 追求高效能與可維護性 (Performant & Maintainable)
@@ -39,7 +39,10 @@
 
 ## 🚀 版本歷史 (Changelog)
 
-### **v1.6.0 (本次更新)**
+### **v1.7.0 (本次更新)**
+- **重構**: 乘法練習模式改為預設包含所有不重複題目 (共 80 題) 的隨機測驗，移除了開始前的數字選擇步驟，提供更全面的練習體驗。
+
+### **v1.6.0**
 - **新增**: 為應用程式設計並新增了一個具代表性的網站圖示 (favicon)，以「畢業帽」為主題，象徵學習與成就。
 
 ### **v1.5.0**

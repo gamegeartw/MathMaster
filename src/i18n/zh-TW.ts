@@ -15,6 +15,7 @@ export const zhTW = {
   addition: '加法',
   subtraction: '減法',
   division: '估商',
+  multiplication: '乘法',
   mixed: '綜合',
   viewLeaderboard: '🏆 查看排行榜',
   appDescription: '適用五年級 • 範圍 21-70',
@@ -50,6 +51,7 @@ export const zhTW = {
   subPractice: '減法練習',
   divPractice: '估商練習',
   divPracticeWithNum: '估商練習 ({divisor})',
+  mulPractice: '乘法練習',
   mixedChallenge: '綜合挑戰',
 
   // Feedback Messages
@@ -69,4 +71,5 @@ export const zhTW = {
   addHintPrompt: '請用繁體中文，簡單地向小學五年級學生解釋如何計算 {a} 加 {b}。',
   subHintPrompt: '請用繁體中文，簡單地向小學五年級學生解釋如何計算 {a} 減 {b}。',
   divHintPrompt: '請用繁體中文，簡單解釋如何估算 {dividend} 除以 {divisor} 的商數。只要教學生找出整數部分的商即可。',
+  mulHintPrompt: '請用繁體中文，簡單地向小學五年級學生解釋如何計算 {a} 乘以 {b}。',
 };

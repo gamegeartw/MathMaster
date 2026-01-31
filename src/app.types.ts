@@ -10,5 +10,6 @@ export enum MathMode {
   Add = 'add',
   Sub = 'sub',
   Div = 'div',
+  Mul = 'mul',
   Mixed = 'mixed',
 }

@@ -28,6 +28,12 @@
       <span class="text-3xl">➖</span> 
       <span class="text-xl font-bold">{{ i18n.t('subtraction') }}</span>
     </button>
+    
+    <button (click)="selectMode(MathMode.Mul)" 
+      class="aspect-[4/3] rounded-2xl bg-red-500 hover:bg-red-600 text-white shadow-lg transform transition active:scale-95 flex flex-col items-center justify-center gap-1 p-2">
+      <span class="text-3xl">✖️</span> 
+      <span class="text-xl font-bold">{{ i18n.t('multiplication') }}</span>
+    </button>
 
     <button (click)="selectMode(MathMode.Div)" 
       class="aspect-[4/3] rounded-2xl bg-purple-500 hover:bg-purple-600 text-white shadow-lg transform transition active:scale-95 flex flex-col items-center justify-center gap-1 p-2">
@@ -36,7 +42,7 @@
     </button>
     
     <button (click)="selectMode(MathMode.Mixed)" 
-      class="aspect-[4/3] rounded-2xl bg-orange-500 hover:bg-orange-600 text-white shadow-lg transform transition active:scale-95 flex flex-col items-center justify-center gap-1 p-2">
+      class="col-span-2 py-4 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white shadow-lg transform transition active:scale-95 flex flex-col items-center justify-center gap-1 p-2">
       <span class="text-3xl">🎲</span> 
       <span class="text-xl font-bold">{{ i18n.t('mixed') }}</span>
     </button>

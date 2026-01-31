@@ -39,7 +39,7 @@ export class AppComponent {
   voiceService = inject(VoiceService);
 
   // App Info
-  version = signal<string>('v1.6.0');
+  version = signal<string>('v1.7.0');
 
   // Expose enums to template
   AppMode = AppMode;
@@ -55,6 +55,7 @@ export class AppComponent {
   userAnswer = signal<string>('');
   score = signal<number>(0);
   questionCount = signal<number>(0);
+  multiplicationProblemQueue = signal<[number, number][]>([]);
   
   // Configuration
   totalQuestions = signal<number>(10);
@@ -84,6 +85,7 @@ export class AppComponent {
     switch (this.selectedMathMode()) {
       case MathMode.Add: return this.i18n.t('addPractice');
       case MathMode.Sub: return this.i18n.t('subPractice');
+      case MathMode.Mul: return this.i18n.t('mulPractice');
       case MathMode.Div: 
         const divisor = this.specificDivisor();
         return divisor
@@ -120,7 +122,7 @@ export class AppComponent {
 
   /**
    * @description 根據使用者在主選單的選擇，設定練習模式並開始遊戲。
-   * @description 如果選擇的是估商模式，會先切換到除數選擇畫面。
+   * @description 如果選擇的是估商模式，會先切換到對應的數字選擇畫面。
    * @param mode - 使用者選擇的數學練習模式 (MathMode)。
    */
   selectMode(mode: MathMode) {
@@ -148,18 +150,41 @@ export class AppComponent {
    * @description 會根據模式設定總題數、重設分數和計數器，並載入第一題。
    */
   initializeGame() {
-    let count = 10;
-    const custom = this.customQuestionCount();
     const mode = this.selectedMathMode();
-    
-    if (custom && custom > 0) {
-      count = custom;
+    let count: number;
+    const custom = this.customQuestionCount();
+
+    if (mode === MathMode.Mul) {
+      const allProblems: [number, number][] = [];
+      for (let i = 2; i <= 9; i++) {
+        for (let j = 1; j <= 10; j++) {
+          allProblems.push([i, j]);
+        }
+      }
+      
+      for (let i = allProblems.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [allProblems[i], allProblems[j]] = [allProblems[j], allProblems[i]];
+      }
+      this.multiplicationProblemQueue.set(allProblems);
+      
+      if (custom && custom > 0) {
+        count = Math.min(custom, allProblems.length);
+      } else {
+        // 預設為所有題目
+        count = allProblems.length;
+      }
     } else {
-      switch (mode) {
-        case MathMode.Add: count = 50; break;
-        case MathMode.Sub: count = 50; break;
-        case MathMode.Div: count = 15; break;
-        case MathMode.Mixed: count = 20; break;
+      if (custom && custom > 0) {
+        count = custom;
+      } else {
+        switch (mode) {
+          case MathMode.Add: count = 50; break;
+          case MathMode.Sub: count = 50; break;
+          case MathMode.Div: count = 15; break;
+          case MathMode.Mixed: count = 20; break;
+          default: count = 10;
+        }
       }
     }
     
@@ -208,9 +233,25 @@ export class AppComponent {
     this.aiHint.set('');
     
     let problem: MathProblem;
-    switch (this.selectedMathMode()) {
+    const mode = this.selectedMathMode();
+
+    switch (mode) {
       case MathMode.Add: problem = this.mathService.generateAddition(); break;
       case MathMode.Sub: problem = this.mathService.generateSubtraction(); break;
+      case MathMode.Mul:
+        let nextPair: [number, number] | undefined;
+        this.multiplicationProblemQueue.update(queue => {
+            nextPair = queue.pop();
+            return queue;
+        });
+
+        if (nextPair) {
+            problem = this.mathService.generateMultiplication(nextPair[0], nextPair[1]);
+        } else {
+            console.error("Ran out of multiplication problems!");
+            problem = this.mathService.generateMixed(); 
+        }
+        break;
       case MathMode.Div: 
         problem = this.mathService.generateDivision(this.specificDivisor() || undefined); 
         break;

@@ -25,6 +25,7 @@ export class LeaderboardComponent {
     switch (mode) {
       case MathMode.Add: return this.i18n.t('addition');
       case MathMode.Sub: return this.i18n.t('subtraction');
+      case MathMode.Mul: return this.i18n.t('multiplication');
       case MathMode.Div: return this.i18n.t('division');
       case MathMode.Mixed: return this.i18n.t('mixed');
       default: return '?';

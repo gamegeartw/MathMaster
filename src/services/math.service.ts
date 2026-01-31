@@ -75,6 +75,26 @@ export class MathService {
   }
 
   /**
+   * @description 產生一道乘法問題 (九九乘法表)。
+   * @description 如果未提供參數，則隨機產生 2-9 乘以 1-10 的題目。如果提供了參數，則使用指定的數字。
+   * @param specificMultiplier - (可選) 指定被乘數。
+   * @param specificOperand2 - (可選) 指定乘數。
+   * @returns {MathProblem} 一個包含問題字串、答案和 AI 提示的數學問題物件。
+   */
+  generateMultiplication(specificMultiplier?: number, specificOperand2?: number): MathProblem {
+    const a = specificMultiplier || this.getRandomInt(2, 9);
+    const b = specificOperand2 || this.getRandomInt(1, 10);
+    return {
+      type: 'mul',
+      questionStr: `${a} × ${b} = ?`,
+      answer: a * b,
+      hintPrompt: this.i18n.t('mulHintPrompt', { a, b }),
+      operand1: a,
+      operand2: b
+    };
+  }
+
+  /**
    * @description 產生一道估商問題。
    * @description 除數可以是指定的數字，或是 2 到 9 之間的隨機數。被除數的範圍會根據除數動態調整，確保商為一位數。
    * @param specificDivisor - (可選) 指定一個特定的除數。如果未提供，則隨機產生。
@@ -104,13 +124,14 @@ export class MathService {
 
   /**
    * @description 產生一道綜合型問題。
-   * @description 會從加法、減法、估商中隨機選擇一種題型。
+   * @description 會從加法、減法、乘法、估商中隨機選擇一種題型。
    * @returns {MathProblem} 一個隨機題型的數學問題物件。
    */
   generateMixed(): MathProblem {
     const r = Math.random();
-    if (r < 0.33) return this.generateAddition();
-    if (r < 0.66) return this.generateSubtraction();
+    if (r < 0.25) return this.generateAddition();
+    if (r < 0.5) return this.generateSubtraction();
+    if (r < 0.75) return this.generateMultiplication();
     return this.generateDivision(); // 在綜合模式中，估商的除數是隨機的
   }
 }
