@@ -29,13 +29,16 @@ export class MathService {
 
   /**
    * @description 產生一道加法問題。
-   * @description 題目範圍為 21 至 70 之間的任意兩個數字相加。
+   * @description 題目範圍為 21 至 70 之間的任意兩個數字相加，並確保兩個數字不相同。
    * @returns {MathProblem} 一個包含問題字串、答案和 AI 提示的數學問題物件。
    */
   generateAddition(): MathProblem {
-    // 21-70 arbitrary two numbers
+    // 21-70 任意兩個數字，並確保兩數不相等
     const a = this.getRandomInt(21, 70);
-    const b = this.getRandomInt(21, 70);
+    let b = this.getRandomInt(21, 70);
+    while (a === b) {
+      b = this.getRandomInt(21, 70);
+    }
     return {
       type: 'add',
       questionStr: `${a} + ${b} = ?`,
@@ -48,13 +51,16 @@ export class MathService {
 
   /**
    * @description 產生一道減法問題。
-   * @description 題目範圍為 21 至 70 之間的數字，並確保結果不會是負數。
+   * @description 題目範圍為 21 至 70 之間的數字，確保兩個數字不相同，並確保結果不會是負數。
    * @returns {MathProblem} 一個包含問題字串、答案和 AI 提示的數學問題物件。
    */
   generateSubtraction(): MathProblem {
-    // 21-70, result non-negative
+    // 21-70, 結果為非負數，且兩數不相等
     let a = this.getRandomInt(21, 70);
     let b = this.getRandomInt(21, 70);
+    while (a === b) {
+      b = this.getRandomInt(21, 70);
+    }
     if (b > a) {
       [a, b] = [b, a]; // 交換 a 和 b，確保 a 比較大，結果為正數
     }
