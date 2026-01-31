@@ -1,0 +1,54 @@
+<!-- 
+  Modal 結構:
+  - 最外層 div 是背景遮罩，監聽點擊事件以關閉視窗。
+  - 內層 div 是內容卡片，使用 (click)="$event.stopPropagation()" 來防止點擊內容時觸發背景的關閉事件。
+-->
+<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 animate-fade-in" (click)="close()">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm max-h-[80vh] flex flex-col p-5" (click)="$event.stopPropagation()">
+    
+    <div class="flex justify-between items-center mb-4 shrink-0">
+      <h2 class="text-xl font-bold text-slate-800">🚀 版本歷史</h2>
+      <button (click)="close()" class="text-gray-400 hover:text-gray-800 text-3xl leading-none">&times;</button>
+    </div>
+    
+    <div class="overflow-y-auto pr-2 -mr-2 text-sm">
+      <!-- v1.5.0 -->
+      <div class="mb-4">
+        <h3 class="font-bold text-indigo-600">v1.5.0 (最新)</h3>
+        <ul class="list-disc list-inside text-slate-600 pl-2 mt-1 space-y-1">
+          <li>新增: 點擊主選單的版本號，可查看版本歷史記錄視窗。</li>
+        </ul>
+      </div>
+      <!-- v1.4.0 -->
+      <div class="mb-4">
+        <h3 class="font-bold text-slate-700">v1.4.0</h3>
+        <ul class="list-disc list-inside text-slate-600 pl-2 mt-1 space-y-1">
+          <li>新增: 在主選單畫面下方顯示應用程式版號。</li>
+          <li>文件: 在 README.md 中新增版本歷史記錄。</li>
+        </ul>
+      </div>
+      <!-- v1.3.0 -->
+      <div class="mb-4">
+        <h3 class="font-bold text-slate-700">v1.3.0</h3>
+        <ul class="list-disc list-inside text-slate-600 pl-2 mt-1 space-y-1">
+          <li>優化: 修正加法與減法練習，確保不會出現兩個相同的數字。</li>
+        </ul>
+      </div>
+      <!-- v1.2.0 -->
+      <div class="mb-4">
+        <h3 class="font-bold text-slate-700">v1.2.0</h3>
+        <ul class="list-disc list-inside text-slate-600 pl-2 mt-1 space-y-1">
+          <li>修正: 修復了測驗結束時總結畫面的時間與遊戲過程中的總耗時不一致的 Bug。</li>
+        </ul>
+      </div>
+      <!-- v1.1.0 -->
+      <div>
+        <h3 class="font-bold text-slate-700">v1.1.0</h3>
+        <ul class="list-disc list-inside text-slate-600 pl-2 mt-1 space-y-1">
+          <li>新增: 在遊戲畫面的右上角，增加顯示「總練習時間」。</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>

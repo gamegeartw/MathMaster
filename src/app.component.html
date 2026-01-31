@@ -36,6 +36,7 @@
           (customQuestionCountChange)="handleCustomQuestionCountChange($event)"
           (modeSelected)="selectMode($event)"
           (leaderboardClicked)="showLeaderboard()"
+          (versionClicked)="toggleChangelog()"
         />
       }
       @case (AppMode.DivSelect) {
@@ -83,6 +84,10 @@
         />
       }
     }
-
   </main>
+  
+  @if(showChangelog()) {
+    <app-changelog (closeClicked)="toggleChangelog()" />
+  }
+
 </div>

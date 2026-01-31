@@ -15,6 +15,7 @@ export class MenuComponent {
   customQuestionCountChange = output<number | null>();
   modeSelected = output<MathMode>();
   leaderboardClicked = output<void>();
+  versionClicked = output<void>();
 
   i18n = inject(I18nService);
   MathMode = MathMode;

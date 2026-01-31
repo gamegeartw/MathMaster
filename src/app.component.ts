@@ -12,6 +12,7 @@ import { DivisorSelectComponent } from './components/divisor-select/divisor-sele
 import { GameComponent } from './components/game/game.component';
 import { SummaryComponent } from './components/summary/summary.component';
 import { LeaderboardComponent } from './components/leaderboard/leaderboard.component';
+import { ChangelogComponent } from './components/changelog/changelog.component';
 import { AppMode, MathMode } from './app.types';
 
 @Component({
@@ -24,7 +25,8 @@ import { AppMode, MathMode } from './app.types';
     DivisorSelectComponent,
     GameComponent,
     SummaryComponent,
-    LeaderboardComponent
+    LeaderboardComponent,
+    ChangelogComponent
   ],
   templateUrl: './app.component.html',
   styleUrls: []
@@ -37,13 +39,14 @@ export class AppComponent {
   voiceService = inject(VoiceService);
 
   // App Info
-  version = signal<string>('v1.4.0');
+  version = signal<string>('v1.5.0');
 
   // Expose enums to template
   AppMode = AppMode;
 
   // --- State Signals ---
   appMode = signal<AppMode>(AppMode.Menu);
+  showChangelog = signal<boolean>(false);
   selectedMathMode = signal<MathMode>(MathMode.Add);
   specificDivisor = signal<number | null>(null);
   
@@ -90,6 +93,15 @@ export class AppComponent {
       default: return this.i18n.t('appTitle');
     }
   });
+
+  // --- UI Flow ---
+  toggleChangelog(forceClose: boolean = false) {
+    if (forceClose) {
+      this.showChangelog.set(false);
+    } else {
+      this.showChangelog.update(v => !v);
+    }
+  }
 
   // --- Game Flow & Event Handlers ---
 

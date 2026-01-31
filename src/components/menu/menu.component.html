@@ -50,7 +50,7 @@
   <div class="shrink-0 text-center text-gray-400 text-xs">
     {{ i18n.t('appDescription') }}
   </div>
-  <div class="shrink-0 text-center text-gray-300 text-xs mt-1">
+  <button (click)="versionClicked.emit()" class="shrink-0 text-center text-gray-300 hover:text-gray-500 text-xs mt-1 transition-colors">
     {{ version() }}
-  </div>
+  </button>
 </div>
