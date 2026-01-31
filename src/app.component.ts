@@ -39,7 +39,7 @@ export class AppComponent {
   voiceService = inject(VoiceService);
 
   // App Info
-  version = signal<string>('v1.5.0');
+  version = signal<string>('v1.6.0');
 
   // Expose enums to template
   AppMode = AppMode;
