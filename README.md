@@ -27,13 +27,30 @@
 ### 🧱 現代化的元件架構 (Component-Driven Architecture)
 
 - **關注點分離 (Separation of Concerns)**：將應用程式切分為多個獨立、可複用的元件（Components）。每個元件都有明確的職責，例如 `MenuComponent` 負責主選單，`GameComponent` 負責遊戲介面。
-- **智慧容器 vs. 展示元件**：`AppComponent` 作為核心的「智慧容器 (Smart Container)」，負責管理整個 App 的狀態（State）和核心商業邏輯。而 `components/` 目錄下的元件則為「展示元件 (Presentational Components)」，它們只負責接收資料並呈現 UI，大幅降低了程式碼的複雜度。
+- **智慧容器 vs. 展示元件**：`AppComponent` 作為核心的「智慧容器 (Smart Container)」，負責管理整個 App 的狀態（State）和核心商業 logique。而 `components/` 目錄下的元件則為「展示元件 (Presentational Components)」，它們只負責接收資料並呈現 UI，大幅降低了程式碼的複雜度。
 
 ### 🚀 追求高效能與可維護性 (Performant & Maintainable)
 
 - **響應式狀態管理**：全面採用 Angular Signals 進行狀態管理，程式碼更簡潔，且能實現高效能的變更偵測。
 - **型別安全**：使用 TypeScript 與 `enum` 來管理 App 的各種模式與狀態，消除了「魔法字串 (Magic Strings)」，提升了程式碼的健壯性。
 - **國際化 (i18n)**：將所有 UI 文字抽離至獨立的字典檔 (`zh-TW.ts`)，並透過 `I18nService` 進行管理。這樣的設計讓未來新增其他語言版本變得非常容易。
+
+---
+
+## 🚀 版本歷史 (Changelog)
+
+### **v1.4.0 (本次更新)**
+- **新增**: 在主選單畫面下方顯示應用程式版號。
+- **文件**: 在 README.md 中新增版本歷史記錄，並回溯補上先前更新說明。
+
+### **v1.3.0**
+- **優化**: 修正加法與減法練習，確保不會出現兩個相同的數字（例如 35+35），增加題目多樣性。
+
+### **v1.2.0**
+- **修正**: 修復了測驗結束時，總結畫面的時間與遊戲過程中的總耗時不一致的 Bug，確保時間記錄的準確性。
+
+### **v1.1.0**
+- **新增**: 在遊戲畫面的右上角，增加顯示「總練習時間」，讓使用者能同時看到單題時間與整體進度。
 
 ---
 

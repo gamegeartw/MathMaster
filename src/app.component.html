@@ -31,6 +31,7 @@
     @switch (appMode()) {
       @case (AppMode.Menu) {
         <app-menu 
+          [version]="version()"
           [customQuestionCount]="customQuestionCount()"
           (customQuestionCountChange)="handleCustomQuestionCountChange($event)"
           (modeSelected)="selectMode($event)"

@@ -10,6 +10,7 @@ import { I18nService } from '../../services/i18n.service';
   templateUrl: './menu.component.html'
 })
 export class MenuComponent {
+  version = input.required<string>();
   customQuestionCount = input.required<number | null>();
   customQuestionCountChange = output<number | null>();
   modeSelected = output<MathMode>();
